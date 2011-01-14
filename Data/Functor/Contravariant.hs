@@ -27,6 +27,9 @@ module Data.Functor.Contravariant (
   -- * Equivalence Relations
   , Equivalence(..)
   , defaultEquivalence
+  
+  -- * Dual arrows
+  , Op(..)
   ) where
 
 -- | Any instance should be subject to the following laws:
@@ -35,17 +38,21 @@ module Data.Functor.Contravariant (
 -- > contramap f . contramap g = contramap (g . f)
 --
 -- Note, that the second law follows from the free theorem of the type of 
--- 'contramap' and the first law, so you
--- need only check that the former condition holds.
+-- 'contramap' and the first law, so you need only check that the former 
+-- condition holds.
 
 class Contravariant f where
   contramap :: (a -> b) -> f b -> f a 
+
+
 
 newtype Predicate a = Predicate { getPredicate :: a -> Bool } 
 -- | A 'Predicate' is a 'Contravariant' 'Functor', because 'contramap' can 
 -- apply its function argument to the input of the predicate.
 instance Contravariant Predicate where
   contramap f g = Predicate $ getPredicate g . f
+
+
 
 -- | Defines a total ordering on a type as per 'compare'
 newtype Comparison a = Comparison { getComparison :: a -> a -> Ordering } 
@@ -60,6 +67,8 @@ instance Contravariant Comparison where
 defaultComparison :: Ord a => Comparison a
 defaultComparison = Comparison compare
 
+
+
 -- | Define an equivalence relation 
 newtype Equivalence a = Equivalence { getEquivalence :: a -> a -> Bool } 
 -- | Equivalence relations are 'Contravariant', because you can 
@@ -71,3 +80,11 @@ instance Contravariant Equivalence where
 -- | Check for equivalence with '=='
 defaultEquivalence :: Eq a => Equivalence a
 defaultEquivalence = Equivalence (==)
+
+
+
+-- | Dual function arrows.
+newtype Op a b = Op { getOp :: b -> a } 
+
+instance Contravariant (Op a) where
+  contramap f g = Op (getOp g . f)
