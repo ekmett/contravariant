@@ -10,7 +10,7 @@
 --
 -- 'Contravariant' functors, sometimes referred to colloquially as @Cofunctor@,
 -- even though the dual of a 'Functor' is just a 'Functor'. As with 'Functor'
--- the definition of 'Contravariant'' for a given ADT is unambiguous.
+-- the definition of 'Contravariant' for a given ADT is unambiguous.
 ----------------------------------------------------------------------------
 
 module Data.Functor.Contravariant ( 
