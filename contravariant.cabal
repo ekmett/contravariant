@@ -1,0 +1,23 @@
+name:          contravariant
+category:      Control, Data
+version:       0.1.0
+license:       BSD3
+cabal-version: >= 1.6
+license-file:  LICENSE
+author:        Edward A. Kmett
+maintainer:    Edward A. Kmett <ekmett@gmail.com>
+stability:     provisional
+homepage:      http://github.com/ekmett/contravariant/
+copyright:     Copyright (C) 2007-2011 Edward A. Kmett
+synopsis:      Haskell 98 contravariant functors
+description:   Haskell 98 contravariant functors
+build-type:    Simple
+
+source-repository head
+  type: git
+  location: git://github.com/ekmett/contravariant.git
+
+library
+  build-depends: base < 4.5
+  exposed-modules: Data.Functor.Contravariant
+  ghc-options: -Wall 
