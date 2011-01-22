@@ -32,6 +32,10 @@ module Data.Functor.Contravariant (
   , Op(..)
   ) where
 
+import Control.Applicative
+import Data.Functor.Product
+import Data.Functor.Constant
+
 -- | Any instance should be subject to the following laws:
 --
 -- > contramap id = id
@@ -81,10 +85,20 @@ instance Contravariant Equivalence where
 defaultEquivalence :: Eq a => Equivalence a
 defaultEquivalence = Equivalence (==)
 
-
-
 -- | Dual function arrows.
 newtype Op a b = Op { getOp :: b -> a } 
 
 instance Contravariant (Op a) where
   contramap f g = Op (getOp g . f)
+
+-- | Data.Functor.Product
+instance (Contravariant f, Contravariant g) => Contravariant (Product f g) where
+  contramap f (Pair a b) = Pair (contramap f a) (contramap f b)
+
+-- | Data.Functor.Constant
+instance Contravariant (Constant a) where
+  contramap _ (Constant a) = Constant a
+
+-- | Control.Applicative.Const
+instance Contravariant (Const a) where
+  contramap _ (Const a) = Const a
