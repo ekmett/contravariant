@@ -13,10 +13,13 @@
 -- the definition of 'Contravariant' for a given ADT is unambiguous.
 ----------------------------------------------------------------------------
 
-module Data.Functor.Contravariant ( 
+module Data.Functor.Contravariant (
   -- * Contravariant Functors
     Contravariant(..)
-  
+
+  -- * Operators
+  , (>$<), (>$$<)
+
   -- * Predicates
   , Predicate(..)
 
@@ -27,7 +30,7 @@ module Data.Functor.Contravariant (
   -- * Equivalence Relations
   , Equivalence(..)
   , defaultEquivalence
-  
+
   -- * Dual arrows
   , Op(..)
   ) where
@@ -41,28 +44,35 @@ import Data.Functor.Constant
 -- > contramap id = id
 -- > contramap f . contramap g = contramap (g . f)
 --
--- Note, that the second law follows from the free theorem of the type of 
--- 'contramap' and the first law, so you need only check that the former 
+-- Note, that the second law follows from the free theorem of the type of
+-- 'contramap' and the first law, so you need only check that the former
 -- condition holds.
 
 class Contravariant f where
-  contramap :: (a -> b) -> f b -> f a 
+  contramap :: (a -> b) -> f b -> f a
 
+infixl 4 >$<, >$$<
 
+(>$<) :: Contravariant f => (a -> b) -> f b -> f a
+(>$<) = contramap
+{-# INLINE (>$<) #-}
 
-newtype Predicate a = Predicate { getPredicate :: a -> Bool } 
--- | A 'Predicate' is a 'Contravariant' 'Functor', because 'contramap' can 
+(>$$<) :: Contravariant f => f b -> (a -> b) -> f a
+(>$$<) = flip contramap
+{-# INLINE (>$$<) #-}
+
+newtype Predicate a = Predicate { getPredicate :: a -> Bool }
+
+-- | A 'Predicate' is a 'Contravariant' 'Functor', because 'contramap' can
 -- apply its function argument to the input of the predicate.
 instance Contravariant Predicate where
   contramap f g = Predicate $ getPredicate g . f
 
-
-
 -- | Defines a total ordering on a type as per 'compare'
-newtype Comparison a = Comparison { getComparison :: a -> a -> Ordering } 
+newtype Comparison a = Comparison { getComparison :: a -> a -> Ordering }
 
--- | A 'Comparison' is a 'Contravariant' 'Functor', because 'contramap' can 
--- apply its function argument to each input to each input to the 
+-- | A 'Comparison' is a 'Contravariant' 'Functor', because 'contramap' can
+-- apply its function argument to each input to each input to the
 -- comparison function.
 instance Contravariant Comparison where
   contramap f g = Comparison $ \a b -> getComparison g (f a) (f b)
@@ -71,12 +81,10 @@ instance Contravariant Comparison where
 defaultComparison :: Ord a => Comparison a
 defaultComparison = Comparison compare
 
-
-
--- | Define an equivalence relation 
-newtype Equivalence a = Equivalence { getEquivalence :: a -> a -> Bool } 
--- | Equivalence relations are 'Contravariant', because you can 
--- apply the contramapped function to each input to the equivalence 
+-- | Define an equivalence relation
+newtype Equivalence a = Equivalence { getEquivalence :: a -> a -> Bool }
+-- | Equivalence relations are 'Contravariant', because you can
+-- apply the contramapped function to each input to the equivalence
 -- relation.
 instance Contravariant Equivalence where
   contramap f g = Equivalence $ \a b -> getEquivalence g (f a) (f b)
@@ -86,7 +94,7 @@ defaultEquivalence :: Eq a => Equivalence a
 defaultEquivalence = Equivalence (==)
 
 -- | Dual function arrows.
-newtype Op a b = Op { getOp :: b -> a } 
+newtype Op a b = Op { getOp :: b -> a }
 
 instance Contravariant (Op a) where
   contramap f g = Op (getOp g . f)
