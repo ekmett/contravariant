@@ -37,6 +37,7 @@ module Data.Functor.Contravariant (
 
 import Control.Applicative
 import Data.Functor.Product
+import Data.Functor.Compose
 import Data.Functor.Constant
 
 -- | Any instance should be subject to the following laws:
@@ -106,6 +107,11 @@ instance (Contravariant f, Contravariant g) => Contravariant (Product f g) where
 -- | Data.Functor.Constant
 instance Contravariant (Constant a) where
   contramap _ (Constant a) = Constant a
+
+-- | Data.Functor.Compose (see Data.Functor.Contravariant.Compose for
+-- compositions of Contravariant functors with other functor types)
+instance (Functor f, Contravariant g) => Contravariant (Compose f g) where
+    contramap f (Compose x) = Compose (fmap (contramap f) x)
 
 -- | Control.Applicative.Const
 instance Contravariant (Const a) where
