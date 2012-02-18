@@ -36,8 +36,10 @@ module Data.Functor.Contravariant (
   ) where
 
 import Control.Applicative
+import Control.Category
 import Data.Functor.Product
 import Data.Functor.Constant
+import Prelude hiding ((.),id)
 
 -- | Any instance should be subject to the following laws:
 --
@@ -95,6 +97,10 @@ defaultEquivalence = Equivalence (==)
 
 -- | Dual function arrows.
 newtype Op a b = Op { getOp :: b -> a }
+
+instance Category Op where
+  id = Op id
+  Op f . Op g = Op (g . f)
 
 instance Contravariant (Op a) where
   contramap f g = Op (getOp g . f)
