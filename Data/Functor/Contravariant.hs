@@ -36,10 +36,12 @@ module Data.Functor.Contravariant (
   ) where
 
 import Control.Applicative
+import Control.Applicative.Backwards
 import Control.Category
 import Data.Functor.Product
 import Data.Functor.Constant
 import Data.Functor.Compose
+import Data.Functor.Reverse
 import Prelude hiding ((.),id)
 
 -- | Any instance should be subject to the following laws:
@@ -64,8 +66,25 @@ infixl 4 >$<, >$$<
 (>$$<) = flip contramap
 {-# INLINE (>$$<) #-}
 
+instance (Contravariant f, Contravariant g) => Contravariant (Product f g) where
+  contramap f (Pair a b) = Pair (contramap f a) (contramap f b)
+
+instance Contravariant (Constant a) where
+  contramap _ (Constant a) = Constant a
+
+instance Contravariant (Const a) where
+  contramap _ (Const a) = Const a
+
 instance (Functor f, Contravariant g) => Contravariant (Compose f g) where
   contramap f (Compose fga) = Compose (fmap (contramap f) fga)
+  {-# INLINE contramap #-}
+
+instance Contravariant f => Contravariant (Backwards f) where
+  contramap f = Backwards . contramap f . forwards
+  {-# INLINE contramap #-}
+
+instance Contravariant f => Contravariant (Reverse f) where
+  contramap f = Reverse . contramap f . getReverse
   {-# INLINE contramap #-}
 
 newtype Predicate a = Predicate { getPredicate :: a -> Bool }
@@ -110,14 +129,3 @@ instance Category Op where
 instance Contravariant (Op a) where
   contramap f g = Op (getOp g . f)
 
--- | Data.Functor.Product
-instance (Contravariant f, Contravariant g) => Contravariant (Product f g) where
-  contramap f (Pair a b) = Pair (contramap f a) (contramap f b)
-
--- | Data.Functor.Constant
-instance Contravariant (Constant a) where
-  contramap _ (Constant a) = Constant a
-
--- | Control.Applicative.Const
-instance Contravariant (Const a) where
-  contramap _ (Const a) = Const a

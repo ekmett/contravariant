@@ -21,8 +21,9 @@ source-repository head
 
 library
   build-depends:
-    base < 5,
-    transformers >= 0.2 && < 0.4
+    base                          < 5,
+    transformers        >= 0.2 && < 0.4,
+    transformers-compat >= 0.1 && < 1
   exposed-modules:
     Data.Functor.Contravariant
     Data.Functor.Contravariant.Compose
