@@ -13,7 +13,9 @@ copyright:     Copyright (C) 2007-2011 Edward A. Kmett
 synopsis:      Haskell 98 contravariant functors
 description:   Haskell 98 contravariant functors
 build-type:    Simple
-extra-source-files: .travis.yml
+extra-source-files:
+  .travis.yml
+  CHANGELOG.markdown
 
 source-repository head
   type: git
