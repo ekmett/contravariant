@@ -39,6 +39,7 @@ import Control.Applicative
 import Control.Category
 import Data.Functor.Product
 import Data.Functor.Constant
+import Data.Functor.Compose
 import Prelude hiding ((.),id)
 
 -- | Any instance should be subject to the following laws:
@@ -62,6 +63,10 @@ infixl 4 >$<, >$$<
 (>$$<) :: Contravariant f => f b -> (a -> b) -> f a
 (>$$<) = flip contramap
 {-# INLINE (>$$<) #-}
+
+instance (Functor f, Contravariant g) => Contravariant (Compose f g) where
+  contramap f (Compose fga) = Compose (fmap (contramap f) fga)
+  {-# INLINE contramap #-}
 
 newtype Predicate a = Predicate { getPredicate :: a -> Bool }
 
