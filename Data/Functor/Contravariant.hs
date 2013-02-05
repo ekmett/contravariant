@@ -42,6 +42,7 @@ import Data.Functor.Product
 import Data.Functor.Constant
 import Data.Functor.Compose
 import Data.Functor.Reverse
+import Data.Proxy
 import Prelude hiding ((.),id)
 
 -- | Any instance should be subject to the following laws:
@@ -86,6 +87,9 @@ instance Contravariant f => Contravariant (Backwards f) where
 instance Contravariant f => Contravariant (Reverse f) where
   contramap f = Reverse . contramap f . getReverse
   {-# INLINE contramap #-}
+
+instance Contravariant Proxy where
+  contramap _ Proxy = Proxy
 
 newtype Predicate a = Predicate { getPredicate :: a -> Bool }
 

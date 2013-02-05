@@ -1,6 +1,6 @@
 name:          contravariant
 category:      Control, Data
-version:       0.3
+version:       0.4
 license:       BSD3
 cabal-version: >= 1.6
 license-file:  LICENSE
@@ -23,9 +23,10 @@ source-repository head
 
 library
   build-depends:
-    base                          < 5,
-    transformers        >= 0.2 && < 0.4,
-    transformers-compat >= 0.1 && < 1
+    base                            < 5,
+    tagged              >= 0.4.4 && < 1,
+    transformers        >= 0.2   && < 0.4,
+    transformers-compat >= 0.1   && < 1
   exposed-modules:
     Data.Functor.Contravariant
     Data.Functor.Contravariant.Compose
