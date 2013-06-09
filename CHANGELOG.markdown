@@ -1,3 +1,7 @@
+0.4.1
+-----
+* Added `Day` convolution under `Data.Functor.Contravariant.Day`.
+
 0.3
 ---
 * Added `Backwards` and `Reverse` instances for `transformers` 0.3
