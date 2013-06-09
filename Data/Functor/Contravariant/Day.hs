@@ -1,5 +1,6 @@
 {-# LANGUAGE CPP #-}
 {-# LANGUAGE ExistentialQuantification #-}
+{-# LANGUAGE Rank2Types #-}
 #if defined(__GLASGOW_HASKELL__) && __GLASGOW_HASKELL__ > 707
 {-# LANGUAGE DeriveDataTypeable #-}
 #endif
@@ -28,6 +29,8 @@ module Data.Functor.Contravariant.Day
   , swapped
   , intro1, intro2
   , day1, day2
+  , diag
+  , trans1, trans2
   ) where
 
 import Control.Applicative
@@ -77,6 +80,7 @@ runDay (Day fb gc abc) =
 -- @
 -- 'assoc' . 'disassoc' = 'id'
 -- 'disassoc' . 'assoc' = 'id'
+-- 'contramap' f '.' 'assoc' = 'assoc' '.' 'contramap' f
 -- @
 assoc :: Day f (Day g h) a -> Day (Day f g) h a
 assoc (Day fb (Day gd he cde) abc) = Day (Day fb gd id) he $ \a ->
@@ -89,6 +93,7 @@ assoc (Day fb (Day gd he cde) abc) = Day (Day fb gd id) he $ \a ->
 -- @
 -- 'assoc' . 'disassoc' = 'id'
 -- 'disassoc' . 'assoc' = 'id'
+-- 'contramap' f '.' 'disassoc' = 'disassoc' '.' 'contramap' f
 -- @
 disassoc :: Day (Day f g) h a -> Day f (Day g h) a
 disassoc (Day (Day fd ge bde) hc abc) = Day fd (Day ge hc id) $ \a ->
@@ -97,6 +102,10 @@ disassoc (Day (Day fd ge bde) hc abc) = Day fd (Day ge hc id) $ \a ->
       (d, e) -> (d, (e, c))
 
 -- | The monoid for Day convolution /in Haskell/ is symmetric.
+--
+-- @
+-- 'contramap' f '.' 'swapped' = 'swapped' '.' 'contramap' f
+-- @
 swapped :: Day f g a -> Day g f a
 swapped (Day fb gc abc) = Day gc fb (swap . abc)
 
@@ -104,6 +113,7 @@ swapped (Day fb gc abc) = Day gc fb (swap . abc)
 --
 -- @
 -- 'day1' '.' 'intro1' = 'id'
+-- 'contramap' f '.' 'intro1' = 'intro1' '.' 'contramap' f
 -- @
 intro1 :: f a -> Day Proxy f a
 intro1 fa = Day Proxy fa $ \a -> ((),a)
@@ -112,25 +122,60 @@ intro1 fa = Day Proxy fa $ \a -> ((),a)
 --
 -- @
 -- 'day2' '.' 'intro2' = 'id'
+-- 'contramap' f '.' 'intro2' = 'intro2' '.' 'contramap' f
 -- @
 intro2 :: f a -> Day f Proxy a
 intro2 fa = Day fa Proxy $ \a -> (a,())
 
--- | In Haskell we can do general purpose elim (in a more general setting
--- it is only possible to eliminate the unit)
+-- | In Haskell we can do general purpose elimination, but in a more general setting
+-- it is only possible to eliminate the unit.
 --
 -- @
 -- 'day1' '.' 'intro1' = 'id'
--- 'day1' = 'fst' . 'runDay'
+-- 'day1' = 'fst' '.' 'runDay'
+-- 'contramap' f '.' 'day1' = 'day1' '.' 'contramap' f
 -- @
 day1 :: Contravariant f => Day f g a -> f a
 day1 (Day fb _ abc) = contramap (fst . abc) fb
 
--- | In Haskell we can do general purpose elim (in a more general setting
--- it is only possible to eliminate the unit)
+-- | In Haskell we can do general purpose elimination, but in a more general setting
+-- it is only possible to eliminate the unit.
 -- @
 -- 'day2' '.' 'intro2' = 'id'
--- 'day2' = 'snd' . 'runDay'
+-- 'day2' = 'snd' '.' 'runDay'
+-- 'contramap' f '.' 'day2' = 'day2' '.' 'contramap' f
 -- @
 day2 :: Contravariant g => Day f g a -> g a
 day2 (Day _ gc abc) = contramap (snd . abc) gc
+
+-- | Diagonalize the Day convolution:
+--
+-- @
+-- 'day1' '.' 'diag' = 'id'
+-- 'day2' '.' 'diag' = 'id'
+-- 'runDay '.' 'diag' = \a -> (a,a)
+-- 'contramap' f . 'diag' = 'diag' . 'contramap' f
+-- @
+
+diag :: f a -> Day f f a
+diag fa = Day fa fa $ \a -> (a,a)
+
+-- | Apply a natural transformation to the left-hand side of a Day convolution.
+--
+-- This respects the naturality of the natural transformation you supplied:
+--
+-- @
+-- 'contramap' f '.' 'trans1' fg = 'trans1' fg '.' 'contramap' f
+-- @
+trans1 :: (forall x. f x -> g x) -> Day f h a -> Day g h a
+trans1 fg (Day fb hc abc) = Day (fg fb) hc abc
+
+-- | Apply a natural transformation to the right-hand side of a Day convolution.
+--
+-- This respects the naturality of the natural transformation you supplied:
+--
+-- @
+-- 'contramap' f '.' 'trans2' fg = 'trans2' fg '.' 'contramap' f
+-- @
+trans2 :: (forall x. g x -> h x) -> Day f g a -> Day f h a
+trans2 gh (Day fb gc abc) = Day fb (gh gc) abc
