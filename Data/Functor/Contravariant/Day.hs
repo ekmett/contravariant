@@ -1,7 +1,7 @@
 {-# LANGUAGE CPP #-}
 {-# LANGUAGE ExistentialQuantification #-}
 {-# LANGUAGE Rank2Types #-}
-#if defined(__GLASGOW_HASKELL__) && __GLASGOW_HASKELL__ > 707
+#if defined(__GLASGOW_HASKELL__) && __GLASGOW_HASKELL__ >= 707
 {-# LANGUAGE DeriveDataTypeable #-}
 #endif
 #if defined(__GLASGOW_HASKELL__) && __GLASGOW_HASKELL__ <= 707
@@ -44,7 +44,7 @@ import Data.Typeable
 
 -- | The Day convolution of two contravariant functors.
 data Day f g a = forall b c. Day (f b) (g c) (a -> (b, c))
-#if defined(__GLASGOW_HASKELL__) && __GLASGOW_HASKELL__ > 707
+#if defined(__GLASGOW_HASKELL__) && __GLASGOW_HASKELL__ >= 707
   deriving Typeable
 #endif
 
@@ -57,7 +57,7 @@ data Day f g a = forall b c. Day (f b) (g c) (a -> (b, c))
 day :: f a -> g b -> Day f g (a, b)
 day fa gb = Day fa gb id
 
-#if defined(__GLASGOW_HASKELL__) && __GLASGOW_HASKELL__ <= 707
+#if defined(__GLASGOW_HASKELL__) && __GLASGOW_HASKELL__ < 707
 instance (Typeable1 f, Typeable1 g) => Typeable1 (Day f g) where
     typeOf1 tfga = mkTyConApp dayTyCon [typeOf1 (fa tfga), typeOf1 (ga tfga)]
         where fa :: t f (g :: * -> *) a -> f a
