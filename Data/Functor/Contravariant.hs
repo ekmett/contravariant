@@ -1,3 +1,11 @@
+{-# LANGUAGE CPP #-}
+#ifdef __GLASGOW_HASKELL__
+{-# LANGUAGE DeriveDataTypeable #-}
+#if __GLASGOW_HASKELL__ >= 702
+{-# LANGUAGE Trustworthy #-}
+#endif
+#endif
+
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Data.Functor.Contravariant
@@ -44,6 +52,9 @@ import Data.Functor.Compose
 import Data.Functor.Reverse
 import Data.Proxy
 import Prelude hiding ((.),id)
+#ifdef __GLASGOW_HASKELL__
+import Data.Typeable
+#endif
 
 -- | Any instance should be subject to the following laws:
 --
@@ -92,6 +103,11 @@ instance Contravariant Proxy where
   contramap _ Proxy = Proxy
 
 newtype Predicate a = Predicate { getPredicate :: a -> Bool }
+#ifdef __GLASGOW_HASKELL__
+  deriving Typeable
+#endif
+
+
 
 -- | A 'Predicate' is a 'Contravariant' 'Functor', because 'contramap' can
 -- apply its function argument to the input of the predicate.
@@ -100,6 +116,9 @@ instance Contravariant Predicate where
 
 -- | Defines a total ordering on a type as per 'compare'
 newtype Comparison a = Comparison { getComparison :: a -> a -> Ordering }
+#ifdef __GLASGOW_HASKELL__
+  deriving Typeable
+#endif
 
 -- | A 'Comparison' is a 'Contravariant' 'Functor', because 'contramap' can
 -- apply its function argument to each input to each input to the
@@ -113,6 +132,10 @@ defaultComparison = Comparison compare
 
 -- | Define an equivalence relation
 newtype Equivalence a = Equivalence { getEquivalence :: a -> a -> Bool }
+#ifdef __GLASGOW_HASKELL__
+  deriving Typeable
+#endif
+
 -- | Equivalence relations are 'Contravariant', because you can
 -- apply the contramapped function to each input to the equivalence
 -- relation.
@@ -125,6 +148,9 @@ defaultEquivalence = Equivalence (==)
 
 -- | Dual function arrows.
 newtype Op a b = Op { getOp :: b -> a }
+#ifdef __GLASGOW_HASKELL__
+  deriving Typeable
+#endif
 
 instance Category Op where
   id = Op id

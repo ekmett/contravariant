@@ -7,6 +7,9 @@
 #if defined(__GLASGOW_HASKELL__) && __GLASGOW_HASKELL__ <= 707
 {-# LANGUAGE KindSignatures #-}
 #endif
+#if defined(__GLASGOW_HASKELL__) && __GLASGOW_HASKELL__ >= 702
+{-# LANGUAGE Trustworthy #-}
+#endif
 -----------------------------------------------------------------------------
 -- |
 -- Copyright   :  (C) 2013 Edward Kmett, Gershom Bazerman and Derek Elkins
