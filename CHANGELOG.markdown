@@ -1,3 +1,7 @@
+0.4.3
+-----
+* Fixed compatibility with GHC 7.7 and tightened `Safe` Haskell support.
+
 0.4.1
 -----
 * Added `Day` convolution under `Data.Functor.Contravariant.Day`.
