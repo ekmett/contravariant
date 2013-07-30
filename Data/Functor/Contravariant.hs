@@ -2,8 +2,12 @@
 #ifdef __GLASGOW_HASKELL__
 {-# LANGUAGE DeriveDataTypeable #-}
 #if __GLASGOW_HASKELL__ >= 702
+#if MIN_VERSION_transformers(0,3,0)
 #if MIN_VERSION_tagged(0,6,1)
 {-# LANGUAGE Safe #-}
+#else
+{-# LANGUAGE Trustworthy #-}
+#endif
 #else
 {-# LANGUAGE Trustworthy #-}
 #endif
