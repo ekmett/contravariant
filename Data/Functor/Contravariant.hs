@@ -76,7 +76,13 @@ import Data.Typeable
 class Contravariant f where
   contramap :: (a -> b) -> f b -> f a
 
-infixl 4 >$<, >$$<
+  -- | Replace all locations in the output with the same value.
+  -- The default definition is @'contramap' . 'const'@, but this may be
+  -- overridden with a more efficient version.
+  (>$) :: b -> f b -> f a
+  (>$) = contramap . const
+
+infixl 4 >$, >$<, >$$<
 
 (>$<) :: Contravariant f => (a -> b) -> f b -> f a
 (>$<) = contramap
