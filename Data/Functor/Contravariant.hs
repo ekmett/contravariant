@@ -1,5 +1,5 @@
 {-# LANGUAGE CPP #-}
-#ifdef __GLASGOW_HASKELL__
+{-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE DeriveDataTypeable #-}
 #if __GLASGOW_HASKELL__ >= 702
 #if MIN_VERSION_transformers(0,3,0)
@@ -12,12 +12,10 @@
 {-# LANGUAGE Trustworthy #-}
 #endif
 #endif
-#endif
-
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Data.Functor.Contravariant
--- Copyright   :  (C) 2007-2011 Edward Kmett
+-- Copyright   :  (C) 2007-2014 Edward Kmett
 -- License     :  BSD-style (see the file LICENSE)
 --
 -- Maintainer  :  Edward Kmett <ekmett@gmail.com>
@@ -58,10 +56,11 @@ import Data.Functor.Product
 import Data.Functor.Constant
 import Data.Functor.Compose
 import Data.Functor.Reverse
-import Data.Proxy
+import GHC.Generics
 import Prelude hiding ((.),id)
-#ifdef __GLASGOW_HASKELL__
 import Data.Typeable
+#if __GLASGOW_HASKELL__ < 707
+import Data.Proxy
 #endif
 
 -- | Any instance should be subject to the following laws:
@@ -85,6 +84,32 @@ infixl 4 >$<, >$$<
 (>$$<) :: Contravariant f => f b -> (a -> b) -> f a
 (>$$<) = flip contramap
 {-# INLINE (>$$<) #-}
+
+instance Contravariant V1 where
+  contramap _ x = x `seq` undefined
+
+instance Contravariant U1 where
+  contramap _ U1 = U1
+
+instance Contravariant f => Contravariant (Rec1 f) where
+  contramap f (Rec1 fp)= Rec1 (contramap f fp)
+
+instance Contravariant f => Contravariant (M1 i c f) where
+  contramap f (M1 fp) = M1 (contramap f fp)
+
+instance Contravariant (K1 i c) where
+  contramap _ (K1 c) = K1 c
+
+instance (Contravariant f, Contravariant g) => Contravariant (f :*: g) where
+  contramap f (xs :*: ys) = contramap f xs :*: contramap f ys
+
+instance (Functor f, Contravariant g) => Contravariant (f :.: g) where
+  contramap f (Comp1 fg) = Comp1 (fmap (contramap f) fg)
+  {-# INLINE contramap #-}
+
+instance (Contravariant f, Contravariant g) => Contravariant (f :+: g) where
+  contramap f (L1 xs) = L1 (contramap f xs)
+  contramap f (R1 ys) = R1 (contramap f ys)
 
 instance (Contravariant f, Contravariant g) => Contravariant (Product f g) where
   contramap f (Pair a b) = Pair (contramap f a) (contramap f b)
