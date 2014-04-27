@@ -1,3 +1,8 @@
+0.5
+---
+* Added `(>$)`
+* Added instances for `GHC.Generics`
+
 0.4.4
 -----
 * Fixed compatibility with GHC 7.7 and tightened `Safe` Haskell support.
