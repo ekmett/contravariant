@@ -1,6 +1,6 @@
 name:          contravariant
 category:      Control, Data
-version:       0.5.1
+version:       0.5.2
 license:       BSD3
 cabal-version: >= 1.6
 license-file:  LICENSE
@@ -26,7 +26,7 @@ library
     base                            < 5,
     tagged              >= 0.4.4 && < 1,
     transformers        >= 0.2   && < 0.5,
-    transformers-compat >= 0.1   && < 1
+    transformers-compat >= 0.3   && < 1
 
   if impl(ghc >= 7.4 && < 7.6)
     build-depends: ghc-prim
