@@ -1,3 +1,7 @@
+0.5.1
+-----
+* `transformers` 0.4 compatibility
+
 0.5
 ---
 * Added `(>$)`
