@@ -1,17 +1,21 @@
 {-# LANGUAGE CPP #-}
 {-# LANGUAGE TypeOperators #-}
+
+#ifdef __GLASGOW_HASKELL__
+#define LANGUAGE_DeriveDataTypeable
 {-# LANGUAGE DeriveDataTypeable #-}
-#if __GLASGOW_HASKELL__ >= 702
-#if MIN_VERSION_transformers(0,3,0)
-#if MIN_VERSION_tagged(0,6,1)
+#endif
+
+#ifndef MIN_VERSION_tagged
+#define MIN_VERSION_tagged(x,y,z) 1
+#endif
+
+#if defined(__GLASGOW_HASKELL__) && __GLASGOW_HASKELL__ >= 702 && MIN_VERSION_transformers(0,3,0) && MIN_VERSION_tagged(0,6,1)
 {-# LANGUAGE Safe #-}
 #else
 {-# LANGUAGE Trustworthy #-}
 #endif
-#else
-{-# LANGUAGE Trustworthy #-}
-#endif
-#endif
+
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Data.Functor.Contravariant
@@ -51,17 +55,29 @@ module Data.Functor.Contravariant (
 
 import Control.Applicative
 import Control.Applicative.Backwards
+
 import Control.Category
+
 import Data.Functor.Product
+import Data.Functor.Sum
 import Data.Functor.Constant
 import Data.Functor.Compose
 import Data.Functor.Reverse
-import GHC.Generics
-import Prelude hiding ((.),id)
+
+#ifdef LANGUAGE_DeriveDataTypeable
 import Data.Typeable
-#if __GLASGOW_HASKELL__ < 707
+#endif
+
+#if defined(__GLASGOW_HASKELL__) && __GLASGOW_HASKELL__ < 707 && defined(VERSION_tagged)
 import Data.Proxy
 #endif
+
+#if defined(__GLASGOW_HASKELL__) && __GLASGOW_HASKELL__ >= 702
+#define GHC_GENERICS
+import GHC.Generics
+#endif
+
+import Prelude hiding ((.),id)
 
 -- | Any instance should be subject to the following laws:
 --
@@ -91,6 +107,7 @@ infixl 4 >$, >$<, >$$<
 (>$$<) = flip contramap
 {-# INLINE (>$$<) #-}
 
+#ifdef GHC_GENERICS
 instance Contravariant V1 where
   contramap _ x = x `seq` undefined
 
@@ -116,6 +133,11 @@ instance (Functor f, Contravariant g) => Contravariant (f :.: g) where
 instance (Contravariant f, Contravariant g) => Contravariant (f :+: g) where
   contramap f (L1 xs) = L1 (contramap f xs)
   contramap f (R1 ys) = R1 (contramap f ys)
+#endif
+
+instance (Contravariant f, Contravariant g) => Contravariant (Sum f g) where
+  contramap f (InL xs) = InL (contramap f xs)
+  contramap f (InR ys) = InR (contramap f ys)
 
 instance (Contravariant f, Contravariant g) => Contravariant (Product f g) where
   contramap f (Pair a b) = Pair (contramap f a) (contramap f b)
@@ -142,11 +164,9 @@ instance Contravariant Proxy where
   contramap _ Proxy = Proxy
 
 newtype Predicate a = Predicate { getPredicate :: a -> Bool }
-#ifdef __GLASGOW_HASKELL__
+#ifdef LANGUAGE_DeriveDataTypeable
   deriving Typeable
 #endif
-
-
 
 -- | A 'Predicate' is a 'Contravariant' 'Functor', because 'contramap' can
 -- apply its function argument to the input of the predicate.
@@ -155,7 +175,7 @@ instance Contravariant Predicate where
 
 -- | Defines a total ordering on a type as per 'compare'
 newtype Comparison a = Comparison { getComparison :: a -> a -> Ordering }
-#ifdef __GLASGOW_HASKELL__
+#ifdef LANGUAGE_DeriveDataTypeable
   deriving Typeable
 #endif
 
@@ -171,7 +191,7 @@ defaultComparison = Comparison compare
 
 -- | Define an equivalence relation
 newtype Equivalence a = Equivalence { getEquivalence :: a -> a -> Bool }
-#ifdef __GLASGOW_HASKELL__
+#ifdef LANGUAGE_DeriveDataTypeable
   deriving Typeable
 #endif
 
@@ -187,7 +207,7 @@ defaultEquivalence = Equivalence (==)
 
 -- | Dual function arrows.
 newtype Op a b = Op { getOp :: b -> a }
-#ifdef __GLASGOW_HASKELL__
+#ifdef LANGUAGE_DeriveDataTypeable
   deriving Typeable
 #endif
 
@@ -197,4 +217,3 @@ instance Category Op where
 
 instance Contravariant (Op a) where
   contramap f g = Op (getOp g . f)
-

@@ -1,6 +1,6 @@
 name:          contravariant
 category:      Control, Data
-version:       0.5.2
+version:       0.6
 license:       BSD3
 cabal-version: >= 1.6
 license-file:  LICENSE
@@ -21,12 +21,22 @@ source-repository head
   type: git
   location: git://github.com/ekmett/contravariant.git
 
+flag tagged
+  description:
+    You can disable the use of the `tagged` package on older versons of GHC using `-f-tagged`.
+    .
+    Disabling this is an unsupported configuration, but it may be useful for accelerating builds in sandboxes for expert users.
+  default: True
+  manual: True
+
 library
   build-depends:
-    base                            < 5,
-    tagged              >= 0.4.4 && < 1,
-    transformers        >= 0.2   && < 0.5,
-    transformers-compat >= 0.3   && < 1
+    base < 5,
+    transformers >= 0.2 && < 0.5,
+    transformers-compat >= 0.3 && < 1
+
+  if flag(tagged) && !impl(ghc >= 7.7)
+    build-depends: tagged >= 0.4.4 && < 1
 
   if impl(ghc >= 7.4 && < 7.6)
     build-depends: ghc-prim
@@ -35,4 +45,5 @@ library
     Data.Functor.Contravariant
     Data.Functor.Contravariant.Compose
     Data.Functor.Contravariant.Day
+
   ghc-options: -Wall
