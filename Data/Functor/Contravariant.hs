@@ -160,8 +160,10 @@ instance Contravariant f => Contravariant (Reverse f) where
   contramap f = Reverse . contramap f . getReverse
   {-# INLINE contramap #-}
 
+#if (defined(__GLASGOW_HASKELL__) && __GLASGOW_HASKELL__ >= 707) || defined(VERSION_tagged)
 instance Contravariant Proxy where
   contramap _ Proxy = Proxy
+#endif
 
 newtype Predicate a = Predicate { getPredicate :: a -> Bool }
 #ifdef LANGUAGE_DeriveDataTypeable
