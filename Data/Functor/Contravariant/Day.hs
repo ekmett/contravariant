@@ -12,7 +12,7 @@
 #endif
 -----------------------------------------------------------------------------
 -- |
--- Copyright   :  (C) 2013 Edward Kmett, Gershom Bazerman and Derek Elkins
+-- Copyright   :  (C) 2013-2014 Edward Kmett, Gershom Bazerman and Derek Elkins
 -- License     :  BSD-style (see the file LICENSE)
 --
 -- Maintainer  :  Edward Kmett <ekmett@gmail.com>
