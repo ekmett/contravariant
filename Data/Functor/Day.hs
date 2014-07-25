@@ -11,7 +11,15 @@
 -- Stability   :  provisional
 -- Portability :  portable
 --
+-- Eitan Chatav first introduced me to this construction
+--
 -- The Day convolution of two covariant functors is a covariant functor.
+--
+-- Day convolution is usually defined in terms of contravariant functors,
+-- however, it just needs a monoidal category, and Hask^op is also monoidal.
+--
+-- Day convolution can be used to nicely describe monoidal functors as monoid
+-- objects w.r.t this product.
 --
 -- <http://ncatlab.org/nlab/show/Day+convolution>
 ----------------------------------------------------------------------------
