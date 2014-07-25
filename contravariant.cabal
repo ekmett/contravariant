@@ -1,6 +1,6 @@
 name:          contravariant
 category:      Control, Data
-version:       0.6
+version:       0.6.1
 license:       BSD3
 cabal-version: >= 1.6
 license-file:  LICENSE
@@ -45,5 +45,6 @@ library
     Data.Functor.Contravariant
     Data.Functor.Contravariant.Compose
     Data.Functor.Contravariant.Day
+    Data.Functor.Day
 
   ghc-options: -Wall
