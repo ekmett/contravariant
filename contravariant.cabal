@@ -10,8 +10,8 @@ stability:     provisional
 homepage:      http://github.com/ekmett/contravariant/
 bug-reports:   http://github.com/ekmett/contravariant/issues
 copyright:     Copyright (C) 2007-2014 Edward A. Kmett
-synopsis:      Contravariant functors
-description:   Contravariant functors
+synopsis:      Contravariant functors and Day convolution
+description:   Contravariant functors and Day convolution
 build-type:    Simple
 extra-source-files:
   .travis.yml
