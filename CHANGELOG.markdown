@@ -1,3 +1,7 @@
+0.6.1.1
+-------
+* Fixed issue with needing `KindSignatures` on older GHCs
+
 0.6.1
 -----
 * Added covariant `Day` convolution. It isn't contravariant, but it is inspired by the contravariant construction.
