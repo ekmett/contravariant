@@ -166,7 +166,7 @@ day2 (Day _ gc abc) = contramap (snd . abc) gc
 -- @
 -- 'day1' '.' 'diag' = 'id'
 -- 'day2' '.' 'diag' = 'id'
--- 'runDay '.' 'diag' = \a -> (a,a)
+-- 'runDay' '.' 'diag' = \a -> (a,a)
 -- 'contramap' f . 'diag' = 'diag' . 'contramap' f
 -- @
 
