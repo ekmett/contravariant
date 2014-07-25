@@ -1,3 +1,7 @@
+0.6.1
+-----
+* Added covariant `Day` convolution. It isn't contravariant, but it is inspired by the contravariant construction.
+
 0.5.1
 -----
 * `transformers` 0.4 compatibility
