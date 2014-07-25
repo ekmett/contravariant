@@ -87,7 +87,7 @@ disassoc :: Day (Day f g) h a -> Day f (Day g h) a
 disassoc (Day (Day fb gc bce) hd eda) = Day fb (Day gc hd (,)) $ \ b (c,d) ->
   eda (bce b c) d
 
--- | The monoid for Day convolution /in Haskell/ is symmetric.
+-- | The monoid for 'Day' convolution on the cartesian monoidal structure is symmetric.
 --
 -- @
 -- 'fmap' f '.' 'swapped' = 'swapped' '.' 'fmap' f
@@ -95,19 +95,47 @@ disassoc (Day (Day fb gc bce) hd eda) = Day fb (Day gc hd (,)) $ \ b (c,d) ->
 swapped :: Day f g a -> Day g f a
 swapped (Day fb gc abc) = Day gc fb (flip abc)
 
+-- | 'Identity' is the unit of 'Day' convolution
+--
+-- @
+-- 'intro1' '.' 'elim1' = 'id'
+-- 'elim1' '.' 'intro1' = 'id'
+-- @
 intro1 :: f a -> Day Identity f a
 intro1 fa = Day (Identity ()) fa $ \_ a -> a
 
+-- | 'Identity' is the unit of 'Day' convolution
+--
+-- @
+-- 'intro2' '.' 'elim2' = 'id'
+-- 'elim2' '.' 'intro2' = 'id'
+-- @
 intro2 :: f a -> Day f Identity a
 intro2 fa = Day fa (Identity ()) const
 
+-- | 'Identity' is the unit of 'Day' convolution
+--
+-- @
+-- 'intro1' '.' 'elim1' = 'id'
+-- 'elim1' '.' 'intro1' = 'id'
+-- @
 elim1 :: Functor f => Day Identity f a -> f a
 elim1 (Day (Identity b) fc bca) = bca b <$> fc
 
+-- | 'Identity' is the unit of 'Day' convolution
+--
+-- @
+-- 'intro2' '.' 'elim2' = 'id'
+-- 'elim2' '.' 'intro2' = 'id'
+-- @
 elim2 :: Functor f => Day f Identity a -> f a
 elim2 (Day fb (Identity c) bca) = flip bca c <$> fb
 
 -- | Collapse via a monoidal functor.
+--
+-- @ 
+-- 'dap' ('day' f g) = f '<*>' g
+-- @
 dap :: Applicative f => Day f f a -> f a
 dap (Day fb fc abc) = liftA2 abc fb fc
 
