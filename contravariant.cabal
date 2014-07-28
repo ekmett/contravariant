@@ -1,6 +1,6 @@
 name:          contravariant
 category:      Control, Data
-version:       0.6.1.1
+version:       0.7
 license:       BSD3
 cabal-version: >= 1.6
 license-file:  LICENSE
@@ -10,8 +10,8 @@ stability:     provisional
 homepage:      http://github.com/ekmett/contravariant/
 bug-reports:   http://github.com/ekmett/contravariant/issues
 copyright:     Copyright (C) 2007-2014 Edward A. Kmett
-synopsis:      Contravariant functors and Day convolution
-description:   Contravariant functors and Day convolution
+synopsis:      Contravariant functors
+description:   Contravariant functors
 build-type:    Simple
 extra-source-files:
   .travis.yml
@@ -44,7 +44,5 @@ library
   exposed-modules:
     Data.Functor.Contravariant
     Data.Functor.Contravariant.Compose
-    Data.Functor.Contravariant.Day
-    Data.Functor.Day
 
   ghc-options: -Wall
