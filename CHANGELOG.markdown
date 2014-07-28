@@ -1,3 +1,7 @@
+0.7
+---
+* Removed `Day` convolution. The right adjoint of Day convolution is in `kan-extensions` as the right Kan lift. Moving these there to avoid forcing orphan instances. It also rather dramatically reduces the number of extensions required.
+
 0.6.1.1
 -------
 * Fixed issue with needing `KindSignatures` on older GHCs
