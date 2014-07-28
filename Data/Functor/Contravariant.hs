@@ -246,3 +246,11 @@ instance Semigroup a => Semigroup (Op a b) where
 instance Monoid a => Monoid (Op a b) where
   mempty = Op (const mempty)
   mappend (Op p) (Op q) = Op $ \a -> mappend (p a) (q a)
+
+instance Num a => Num (Op a b) where
+  Op f + Op g = Op $ \a -> f a + g a
+  Op f * Op g = Op $ \a -> f a * g a
+  Op f - Op g = Op $ \a -> f a - g a
+  abs (Op f) = Op $ abs . f
+  signum (Op f) = Op $ signum . f
+  fromInteger = Op . const . fromInteger
