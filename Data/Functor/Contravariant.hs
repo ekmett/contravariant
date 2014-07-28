@@ -65,7 +65,7 @@ import Data.Functor.Constant
 import Data.Functor.Compose
 import Data.Functor.Reverse
 
-import Data.Monoid (Monoid(..))
+import Data.Semigroup (Semigroup(..), Monoid(..))
 
 #ifdef LANGUAGE_DeriveDataTypeable
 import Data.Typeable
@@ -190,6 +190,9 @@ newtype Comparison a = Comparison { getComparison :: a -> a -> Ordering }
 instance Contravariant Comparison where
   contramap f g = Comparison $ \a b -> getComparison g (f a) (f b)
 
+instance Semigroup (Comparison a) where
+  Comparison p <> Comparison q = Comparison $ mappend p q
+
 instance Monoid (Comparison a) where
   mempty = Comparison (\_ _ -> EQ)
   mappend (Comparison p) (Comparison q) = Comparison $ mappend p q
@@ -209,6 +212,9 @@ newtype Equivalence a = Equivalence { getEquivalence :: a -> a -> Bool }
 -- relation.
 instance Contravariant Equivalence where
   contramap f g = Equivalence $ \a b -> getEquivalence g (f a) (f b)
+
+instance Semigroup (Equivalence a) where
+  Equivalence p <> Equivalence q = Equivalence $ \a b -> p a b && q a b
 
 instance Monoid (Equivalence a) where
   mempty = Equivalence (\_ _ -> True)
@@ -233,3 +239,10 @@ instance Category Op where
 
 instance Contravariant (Op a) where
   contramap f g = Op (getOp g . f)
+
+instance Semigroup a => Semigroup (Op a b) where
+  Op p <> Op q = Op $ \a -> p a <> q a
+
+instance Monoid a => Monoid (Op a b) where
+  mempty = Op (const mempty)
+  mappend (Op p) (Op q) = Op $ \a -> mappend (p a) (q a)

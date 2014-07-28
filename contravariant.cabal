@@ -1,6 +1,6 @@
 name:          contravariant
 category:      Control, Data
-version:       1.0
+version:       1.1
 license:       BSD3
 cabal-version: >= 1.6
 license-file:  LICENSE
@@ -32,6 +32,7 @@ flag tagged
 library
   build-depends:
     base < 5,
+    semigroups >= 0.15.2 && < 1,
     transformers >= 0.2 && < 0.5,
     transformers-compat >= 0.3 && < 1
 
