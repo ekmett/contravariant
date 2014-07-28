@@ -48,6 +48,7 @@ module Data.Functor.Contravariant (
   -- * Equivalence Relations
   , Equivalence(..)
   , defaultEquivalence
+  , comparisonEquivalence
 
   -- * Dual arrows
   , Op(..)
@@ -63,6 +64,8 @@ import Data.Functor.Sum
 import Data.Functor.Constant
 import Data.Functor.Compose
 import Data.Functor.Reverse
+
+import Data.Monoid (Monoid(..))
 
 #ifdef LANGUAGE_DeriveDataTypeable
 import Data.Typeable
@@ -187,6 +190,10 @@ newtype Comparison a = Comparison { getComparison :: a -> a -> Ordering }
 instance Contravariant Comparison where
   contramap f g = Comparison $ \a b -> getComparison g (f a) (f b)
 
+instance Monoid (Comparison a) where
+  mempty = Comparison (\_ _ -> EQ)
+  mappend (Comparison p) (Comparison q) = Comparison $ mappend p q
+
 -- | Compare using 'compare'
 defaultComparison :: Ord a => Comparison a
 defaultComparison = Comparison compare
@@ -203,9 +210,16 @@ newtype Equivalence a = Equivalence { getEquivalence :: a -> a -> Bool }
 instance Contravariant Equivalence where
   contramap f g = Equivalence $ \a b -> getEquivalence g (f a) (f b)
 
+instance Monoid (Equivalence a) where
+  mempty = Equivalence (\_ _ -> True)
+  mappend (Equivalence p) (Equivalence q) = Equivalence $ \a b -> p a b && q a b
+
 -- | Check for equivalence with '=='
 defaultEquivalence :: Eq a => Equivalence a
 defaultEquivalence = Equivalence (==)
+
+comparisonEquivalence :: Comparison a -> Equivalence a
+comparisonEquivalence (Comparison p) = Equivalence $ \a b -> p a b == EQ
 
 -- | Dual function arrows.
 newtype Op a b = Op { getOp :: b -> a }
