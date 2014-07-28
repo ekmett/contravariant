@@ -1,6 +1,7 @@
-0.7
+1.0
 ---
 * Removed `Day` convolution. The right adjoint of Day convolution is in `kan-extensions` as the right Kan lift. Moving these there to avoid forcing orphan instances. It also rather dramatically reduces the number of extensions required.
+* This requires a first digit bump as it breaks several of my own packages.
 
 0.6.1.1
 -------
