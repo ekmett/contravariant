@@ -50,6 +50,9 @@ instance (Functor f, Functor g) => Functor (ComposeCF f g) where
 
 instance (ContravariantApplicative f, Applicative g) => ContravariantApplicative (ComposeCF f g) where
   conquer = ComposeCF conquer
-  divide abc (ComposeCF fb) (ComposeCF fc) = ComposeCF $ divide ((fmap fst &&& fmap snd) . fmap abc) fb fc
+  divide abc (ComposeCF fb) (ComposeCF fc) = ComposeCF $ divide (funzip . fmap abc) fb fc
+
+funzip :: Functor f => f (a, b) -> (f a, f b)
+funzip = fmap fst &&& fmap snd
 
 -- | Composition of contravariant and covariant functors
