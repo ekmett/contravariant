@@ -1,6 +1,6 @@
 module Data.Functor.Contravariant.Applicative 
   ( ContravariantApplicative(..), divided
-  , ContravariantAlternative(..), lost
+  , ContravariantAlternative(..), lost, chosen
   ) where
 
 import Data.Functor.Contravariant
@@ -50,6 +50,9 @@ class ContravariantApplicative f => ContravariantAlternative f where
 
 lost :: ContravariantAlternative f => f Void
 lost = lose id
+
+chosen :: f b -> f c -> f (Either b c)
+chosen = choose id
 
 instance ContravariantAlternative Comparison where
   lose f = Comparison $ \a _ -> absurd (f a)
