@@ -1,6 +1,6 @@
 name:          contravariant
 category:      Control, Data
-version:       1.1
+version:       1.1.1
 license:       BSD3
 cabal-version: >= 1.6
 license-file:  LICENSE
@@ -34,7 +34,8 @@ library
     base < 5,
     semigroups >= 0.15.2 && < 1,
     transformers >= 0.2 && < 0.5,
-    transformers-compat >= 0.3 && < 1
+    transformers-compat >= 0.3 && < 1,
+    void >= 0.6 && < 1
 
   if flag(tagged) && !impl(ghc >= 7.7)
     build-depends: tagged >= 0.4.4 && < 1
@@ -44,7 +45,7 @@ library
 
   exposed-modules:
     Data.Functor.Contravariant
-    Data.Functor.Contravariant.Coapplicative
+    Data.Functor.Contravariant.Applicative
     Data.Functor.Contravariant.Compose
 
   ghc-options: -Wall

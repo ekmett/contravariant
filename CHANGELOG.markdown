@@ -1,3 +1,7 @@
+1.1.1
+-----
+* Added `Data.Functor.Contravariant.Applicative`
+
 1.0
 ---
 * Removed `Day` convolution. The right adjoint of Day convolution is in `kan-extensions` as the right Kan lift. Moving these there to avoid forcing orphan instances. It also rather dramatically reduces the number of extensions required.
