@@ -1,6 +1,6 @@
 module Data.Functor.Contravariant.Applicative 
-  ( ContravariantApplicative(..)
-  , ContravariantAlternative(..)
+  ( ContravariantApplicative(..), divided
+  , ContravariantAlternative(..), lost
   ) where
 
 import Data.Functor.Contravariant
@@ -14,6 +14,9 @@ import Data.Void
 class Contravariant f => ContravariantApplicative f where
   divide  :: (a -> (b, c)) -> f b -> f c -> f a
   conquer :: f a
+
+divided :: ContravariantApplicative f => f a -> f b -> f (a, b)
+divided = divide id
   
 instance Monoid r => ContravariantApplicative (Op r) where
   divide f (Op g) (Op h) = Op $ \a -> case f a of
@@ -44,6 +47,9 @@ instance ContravariantApplicative Predicate where
 class ContravariantApplicative f => ContravariantAlternative f where
   lose :: (a -> Void) -> f a
   choose :: (a -> Either b c) -> f b -> f c -> f a
+
+lost :: ContravariantAlternative f => f Void
+lost = lose id
 
 instance ContravariantAlternative Comparison where
   lose f = Comparison $ \a _ -> absurd (f a)
