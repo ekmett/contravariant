@@ -1,4 +1,7 @@
-module Data.Functor.Contravariant.Coapplicative where
+module Data.Functor.Contravariant.Coapplicative 
+  ( Coapplicative(..)
+  , Coalternative(..)
+  ) where
 
 import Data.Functor.Contravariant
 import Data.Monoid
@@ -28,3 +31,28 @@ instance Coapplicative Predicate where
   divide f (Predicate g) (Predicate h) = Predicate $ \a -> case f a of
     (b, c) -> g b && h c
   conquer = Predicate $ const True
+
+class Coapplicative f => Coalternative f where
+  choose :: (a -> Either b c) -> f b -> f c -> f a
+
+instance Coalternative Comparison where
+  choose f (Comparison g) (Comparison h) = Comparison $ \a b -> case f a of
+    Left c -> case f b of
+      Left d -> g c d
+      Right{} -> LT
+    Right c -> case f b of
+      Left{} -> GT
+      Right d -> h c d
+
+instance Coalternative Equivalence where
+  choose f (Equivalence g) (Equivalence h) = Equivalence $ \a b -> case f a of
+    Left c -> case f b of
+      Left d -> g c d
+      Right{} -> False
+    Right c -> case f b of
+      Left{} -> False
+      Right d -> h c d
+
+instance Coalternative Predicate where
+  choose f (Predicate g) (Predicate h) = Predicate $ either g h . f
+
