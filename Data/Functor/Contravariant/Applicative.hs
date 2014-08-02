@@ -51,7 +51,7 @@ class ContravariantApplicative f => ContravariantAlternative f where
 lost :: ContravariantAlternative f => f Void
 lost = lose id
 
-chosen :: f b -> f c -> f (Either b c)
+chosen :: ContravariantAlternative f => f b -> f c -> f (Either b c)
 chosen = choose id
 
 instance ContravariantAlternative Comparison where
