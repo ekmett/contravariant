@@ -1,5 +1,8 @@
 module Data.Functor.Contravariant.Divisible
-  ( Divisible(..), divided
+  (
+  -- * Contravariant Applicative
+    Divisible(..), divided, liftD
+  -- * Contravariant Alternative
   , Decidable(..), lost, chosen
   ) where
 
