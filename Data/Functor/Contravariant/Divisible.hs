@@ -11,12 +11,66 @@ import Data.Void
 -- * Contravariant Applicative
 --------------------------------------------------------------------------------
 
+-- |
+--
+-- A 'Divisible' contravariant functor is the contravariant analogue of 'Applicative'.
+--
+-- A 'Divisible' contravariant functor is a monoid object in the category of presheaves 
+-- from Hask to Hask, equipped with Day convolution mapping the Cartesian product of the
+-- source to the Cartesian product of the target.
+--
+-- By way of contrast, an 'Applicative' functor can be viewed as a monoid object in the
+-- category of copresheaves from Hask to Hask, equipped with Day convolution mapping the
+-- Cartesian product of the source to the Cartesian product of the target.
+--
+-- Given the canonical diagonal morphism:
+--
+-- @
+-- delta a = (a,a)
+-- @
+-- 
+-- @'divide' 'delta'@ should be associative with 'conquer' as a unit
+--
+-- @
+-- 'divide' 'delta' m 'conquer' = m
+-- 'divide' 'delta' 'conquer' m = m
+-- 'divide' 'delta' ('divide' 'delta' m n) o = 'divide' 'delta' m ('divide' 'delta' n o)
+-- @
+--
+-- With more general arguments you'll need to reassociate and project using the monoidal
+-- structure of the source category. (Here fst and snd are used in lieu of the more restricted
+-- lambda and rho, but this construction works with just a monoidal category.)
+--
+-- @
+-- 'divide' f m 'conquer' = 'contramap' ('fst' . f) m
+-- 'divide' f 'conquer' m = 'contramap' ('snd' . f) m
+-- 'divide' f ('divide' g m n) o = 'divide' f' m ('divide' 'id' n o) where
+--   f' a = case f a of (bc,d) -> case g bc of (b,c) -> (a,(b,c))
+-- @
 class Contravariant f => Divisible f where
   divide  :: (a -> (b, c)) -> f b -> f c -> f a
+  -- | The underlying theory would suggest that this should be:
+  --
+  -- @
+  -- conquer :: (a -> ()) -> f a
+  -- @
+  --
+  -- However, as we are working over a Cartesian category (Hask) and the Cartesian product, such an input
+  -- morphism is uniquely determined to be @'const' 'mempty'@, so we elide it.
   conquer :: f a
 
+-- |
+-- @
+-- 'divided' = 'divide' 'id'
+-- @
 divided :: Divisible f => f a -> f b -> f (a, b)
 divided = divide id
+
+-- |
+-- This is the divisible analogue of 'liftA'. It gives a viable default definition for 'contramap' in terms
+-- of the members of 'Divisible'.
+liftD :: Divisible f => (a -> b) -> f b -> f a
+liftD f = divide ((,) () . f) conquer
   
 instance Monoid r => Divisible (Op r) where
   divide f (Op g) (Op h) = Op $ \a -> case f a of
@@ -43,6 +97,25 @@ instance Divisible Predicate where
 --------------------------------------------------------------------------------
 -- * Contravariant Alternative
 --------------------------------------------------------------------------------
+
+-- |
+--
+-- A 'Divisible' contravariant functor is a monoid object in the category of presheaves 
+-- from Hask to Hask, equipped with Day convolution mapping the cartesian product of the
+-- source to the Cartesian product of the target.
+--
+-- Given the canonical diagonal morphism:
+--
+-- @
+-- 'choose' Left m ('lose' f)  = m
+-- 'choose' Right ('lose' f) m = m
+-- 'choose' f ('choose' g m n) o = 'divide' f' m ('divide' 'id' n o) where
+--   f' bcd = 'either' ('either' 'id' ('Right' . 'Left') . g) ('Right' . 'Right') . f
+-- @
+--
+-- In addition, we expect the same kind of distributive law as is satisfied by the usual
+-- covariant 'Alternative', w.r.t 'Applicative', which should be fully formulated and
+-- added here at some point!
 
 class Divisible f => Decidable f where
   -- | The only way to win is not to play.
