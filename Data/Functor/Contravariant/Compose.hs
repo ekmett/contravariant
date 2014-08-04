@@ -18,7 +18,7 @@ module Data.Functor.Contravariant.Compose
 import Control.Arrow
 import Control.Applicative
 import Data.Functor.Contravariant
-import Data.Functor.Contravariant.Applicative
+import Data.Functor.Contravariant.Divisible
 
 -- | Composition of two contravariant functors
 newtype Compose f g a = Compose { getCompose :: f (g a) }
@@ -35,7 +35,7 @@ instance (Functor f, Contravariant g) => Contravariant (ComposeFC f g) where
 instance (Functor f, Functor g) => Functor (ComposeFC f g) where
     fmap f (ComposeFC x) = ComposeFC (fmap (fmap f) x)
 
-instance (Applicative f, ContravariantApplicative g) => ContravariantApplicative (ComposeFC f g) where
+instance (Applicative f, Divisible g) => Divisible (ComposeFC f g) where
   conquer = ComposeFC $ pure conquer
   divide abc (ComposeFC fb) (ComposeFC fc) = ComposeFC $ divide abc <$> fb <*> fc
 
@@ -48,7 +48,7 @@ instance (Contravariant f, Functor g) => Contravariant (ComposeCF f g) where
 instance (Functor f, Functor g) => Functor (ComposeCF f g) where
     fmap f (ComposeCF x) = ComposeCF (fmap (fmap f) x)
 
-instance (ContravariantApplicative f, Applicative g) => ContravariantApplicative (ComposeCF f g) where
+instance (Divisible f, Applicative g) => Divisible (ComposeCF f g) where
   conquer = ComposeCF conquer
   divide abc (ComposeCF fb) (ComposeCF fc) = ComposeCF $ divide (funzip . fmap abc) fb fc
 

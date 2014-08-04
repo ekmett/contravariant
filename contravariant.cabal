@@ -45,7 +45,7 @@ library
 
   exposed-modules:
     Data.Functor.Contravariant
-    Data.Functor.Contravariant.Applicative
+    Data.Functor.Contravariant.Divisible
     Data.Functor.Contravariant.Compose
 
   ghc-options: -Wall
