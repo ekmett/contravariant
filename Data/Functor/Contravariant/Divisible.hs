@@ -1,9 +1,9 @@
 module Data.Functor.Contravariant.Divisible
   (
   -- * Contravariant Applicative
-    Divisible(..), divided, liftD
+    Divisible(..), divided, conquered, liftD
   -- * Contravariant Alternative
-  , Decidable(..), lost, chosen
+  , Decidable(..), chosen, lost
   ) where
 
 import Data.Functor.Contravariant
@@ -18,9 +18,9 @@ import Data.Void
 --
 -- A 'Divisible' contravariant functor is the contravariant analogue of 'Applicative'.
 --
--- A 'Divisible' contravariant functor is a monoid object in the category of presheaves 
--- from Hask to Hask, equipped with Day convolution mapping the Cartesian product of the
--- source to the Cartesian product of the target.
+-- In denser jargon, a 'Divisible' contravariant functor is a monoid object in the category
+-- of presheaves from Hask to Hask, equipped with Day convolution mapping the Cartesian
+-- product of the source to the Cartesian product of the target.
 --
 -- By way of contrast, an 'Applicative' functor can be viewed as a monoid object in the
 -- category of copresheaves from Hask to Hask, equipped with Day convolution mapping the
@@ -69,9 +69,22 @@ class Contravariant f => Divisible f where
 divided :: Divisible f => f a -> f b -> f (a, b)
 divided = divide id
 
+-- | Redundant, but provided for symmetry.
+--
+-- @
+-- 'conquered' = 'conquer
+-- @
+conquered :: Divisible f => f ()
+conquered = conquer
+
+
 -- |
 -- This is the divisible analogue of 'liftA'. It gives a viable default definition for 'contramap' in terms
 -- of the members of 'Divisible'.
+--
+-- @
+-- 'liftD' f = 'divide' ((,) () . f) 'conquer'
+-- @
 liftD :: Divisible f => (a -> b) -> f b -> f a
 liftD f = divide ((,) () . f) conquer
   
@@ -107,8 +120,6 @@ instance Divisible Predicate where
 -- from Hask to Hask, equipped with Day convolution mapping the cartesian product of the
 -- source to the Cartesian product of the target.
 --
--- Given the canonical diagonal morphism:
---
 -- @
 -- 'choose' Left m ('lose' f)  = m
 -- 'choose' Right ('lose' f) m = m
@@ -125,9 +136,17 @@ class Divisible f => Decidable f where
   lose :: (a -> Void) -> f a
   choose :: (a -> Either b c) -> f b -> f c -> f a
 
+-- |
+-- @
+-- 'lost' = 'lose' 'id'
+-- @
 lost :: Decidable f => f Void
 lost = lose id
 
+-- |
+-- @
+-- 'chosen' = 'choose' 'id'
+-- @
 chosen :: Decidable f => f b -> f c -> f (Either b c)
 chosen = choose id
 
