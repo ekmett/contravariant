@@ -39,6 +39,10 @@ instance (Applicative f, Divisible g) => Divisible (ComposeFC f g) where
   conquer = ComposeFC $ pure conquer
   divide abc (ComposeFC fb) (ComposeFC fc) = ComposeFC $ divide abc <$> fb <*> fc
 
+instance (Applicative f, Decidable g) => Decidable (ComposeFC f g) where
+  lose f = ComposeFC $ pure (lose f)
+  choose abc (ComposeFC fb) (ComposeFC fc) = ComposeFC $ choose abc <$> fb <*> fc
+
 -- | Composition of contravariant and covariant functors
 newtype ComposeCF f g a = ComposeCF { getComposeCF :: f (g a) }
 
