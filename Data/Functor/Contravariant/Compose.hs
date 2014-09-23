@@ -58,5 +58,3 @@ instance (Divisible f, Applicative g) => Divisible (ComposeCF f g) where
 
 funzip :: Functor f => f (a, b) -> (f a, f b)
 funzip = fmap fst &&& fmap snd
-
--- | Composition of contravariant and covariant functors
