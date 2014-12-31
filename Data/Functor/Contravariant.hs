@@ -10,10 +10,16 @@
 #define MIN_VERSION_tagged(x,y,z) 1
 #endif
 
-#if defined(__GLASGOW_HASKELL__) && __GLASGOW_HASKELL__ >= 702 && MIN_VERSION_transformers(0,3,0) && MIN_VERSION_tagged(0,6,1)
+#ifndef MIN_VERSION_base
+#define MIN_VERSION_base(x,y,z) 1
+#endif
+
+#if defined(__GLASGOW_HASKELL__) && __GLASGOW_HASKELL__ >= 702
+#if MIN_VERSION_transformers(0,3,0) && MIN_VERSION_tagged(0,6,1)
 {-# LANGUAGE Safe #-}
 #else
 {-# LANGUAGE Trustworthy #-}
+#endif
 #endif
 
 -----------------------------------------------------------------------------
@@ -247,6 +253,7 @@ instance Monoid a => Monoid (Op a b) where
   mempty = Op (const mempty)
   mappend (Op p) (Op q) = Op $ \a -> mappend (p a) (q a)
 
+#if MIN_VERSION_base(4,5,0)
 instance Num a => Num (Op a b) where
   Op f + Op g = Op $ \a -> f a + g a
   Op f * Op g = Op $ \a -> f a * g a
@@ -279,3 +286,4 @@ instance Floating a => Floating (Op a b) where
   acosh (Op f) = Op $ acosh . f
   Op f ** Op g = Op $ \a -> f a ** g a
   logBase (Op f) (Op g) = Op $ \a -> logBase (f a) (g a)
+#endif

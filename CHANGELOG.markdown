@@ -1,3 +1,7 @@
+1.2.0.1
+-----
+* Fix build on GHC 7.0.4
+
 1.1.1
 -----
 * Added `Data.Functor.Contravariant.Applicative`
