@@ -127,9 +127,19 @@ instance Divisible Predicate where
 --   f' bcd = 'either' ('either' 'id' ('Right' . 'Left') . g) ('Right' . 'Right') . f
 -- @
 --
--- In addition, we expect the same kind of distributive law as is satisfied by the usual
--- covariant 'Alternative', w.r.t 'Applicative', which should be fully formulated and
--- added here at some point!
+-- In addition, we expect the same kind of absorption and distributive
+-- law as is satisfied by the usual covariant 'Alternative', w.r.t
+-- 'Applicative'.
+--
+-- @
+-- 'divide' f ('lose' g) m = 'contramap' ('fst' . f) ('lose' g)
+-- 'divide' f ('choose' g m n) o = 'choose' f' ('divide' 'id' m o) ('divide' 'id' n o)
+--   where f' x =
+--           let (b, d) = h x
+--           in case k b of
+--             'Left' c1  -> 'Left'  (c1, d)
+--             'Right' c2 -> 'Right' (c2, d)
+-- @
 
 class Divisible f => Decidable f where
   -- | The only way to win is not to play.
