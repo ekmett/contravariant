@@ -121,8 +121,8 @@ instance Divisible Predicate where
 -- source to the Cartesian product of the target.
 --
 -- @
--- 'choose' Left m ('lose' f)  = m
--- 'choose' Right ('lose' f) m = m
+-- 'choose' 'Left' m ('lose' f)  = m
+-- 'choose' 'Right' ('lose' f) m = m
 -- 'choose' f ('choose' g m n) o = 'divide' f' m ('divide' 'id' n o) where
 --   f' bcd = 'either' ('either' 'id' ('Right' . 'Left') . g) ('Right' . 'Right') . f
 -- @
