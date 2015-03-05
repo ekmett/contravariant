@@ -9,7 +9,7 @@ maintainer:    Edward A. Kmett <ekmett@gmail.com>
 stability:     provisional
 homepage:      http://github.com/ekmett/contravariant/
 bug-reports:   http://github.com/ekmett/contravariant/issues
-copyright:     Copyright (C) 2007-2014 Edward A. Kmett
+copyright:     Copyright (C) 2007-2015 Edward A. Kmett
 synopsis:      Contravariant functors
 description:   Contravariant functors
 build-type:    Simple
