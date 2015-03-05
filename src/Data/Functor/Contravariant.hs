@@ -72,7 +72,11 @@ import Data.Functor.Constant
 import Data.Functor.Compose
 import Data.Functor.Reverse
 
-import Data.Semigroup (Semigroup(..), Monoid(..))
+import Data.Monoid (Monoid(..))
+
+#ifdef MIN_VERSION_semigroups
+import Data.Semigroup (Semigroup(..))
+#endif
 
 #ifdef LANGUAGE_DeriveDataTypeable
 import Data.Typeable
@@ -212,8 +216,10 @@ newtype Comparison a = Comparison { getComparison :: a -> a -> Ordering }
 instance Contravariant Comparison where
   contramap f g = Comparison $ \a b -> getComparison g (f a) (f b)
 
+#ifdef MIN_VERSION_semigroups
 instance Semigroup (Comparison a) where
   Comparison p <> Comparison q = Comparison $ mappend p q
+#endif
 
 instance Monoid (Comparison a) where
   mempty = Comparison (\_ _ -> EQ)
@@ -235,8 +241,10 @@ newtype Equivalence a = Equivalence { getEquivalence :: a -> a -> Bool }
 instance Contravariant Equivalence where
   contramap f g = Equivalence $ \a b -> getEquivalence g (f a) (f b)
 
+#ifdef MIN_VERSION_semigroups
 instance Semigroup (Equivalence a) where
   Equivalence p <> Equivalence q = Equivalence $ \a b -> p a b && q a b
+#endif
 
 instance Monoid (Equivalence a) where
   mempty = Equivalence (\_ _ -> True)
@@ -262,8 +270,10 @@ instance Category Op where
 instance Contravariant (Op a) where
   contramap f g = Op (getOp g . f)
 
+#ifdef MIN_VERSION_semigroups
 instance Semigroup a => Semigroup (Op a b) where
   Op p <> Op q = Op $ \a -> p a <> q a
+#endif
 
 instance Monoid a => Monoid (Op a b) where
   mempty = Op (const mempty)
