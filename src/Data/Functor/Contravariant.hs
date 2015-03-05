@@ -207,6 +207,9 @@ instance Contravariant Predicate where
   contramap f g = Predicate $ getPredicate g . f
 
 -- | Defines a total ordering on a type as per 'compare'
+--
+-- This condition is not checked by the types. You must ensure that the supplied
+-- values are valid total orderings yourself.
 newtype Comparison a = Comparison { getComparison :: a -> a -> Ordering }
 #ifdef LANGUAGE_DeriveDataTypeable
   deriving Typeable
