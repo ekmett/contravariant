@@ -3,6 +3,7 @@
 * Added `phantom` to `Data.Functor.Contravariant`. This combinator was formerly called `coerce` in the `lens` package, but
   GHC 7.8 added a `coerce` method to base with a different meaning.
 * Added an unsupported `-f-semigroups` build flag that disables support for the `semigroups` package.
+* Minor documentation improvements.
 
 1.2.0.1
 -----
