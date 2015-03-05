@@ -1,3 +1,8 @@
+1.2.1
+-----
+* Added `phantom` to `Data.Functor.Contravariant`. This combinator was formerly called `coerce` in the `lens` package, but
+  GHC 7.8 added a `coerce` method to base with a different meaning.
+
 1.2.0.1
 -----
 * Fix build on GHC 7.0.4
