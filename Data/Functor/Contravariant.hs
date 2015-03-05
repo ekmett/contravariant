@@ -14,7 +14,7 @@
 #define MIN_VERSION_base(x,y,z) 1
 #endif
 
-#if defined(__GLASGOW_HASKELL__) && __GLASGOW_HASKELL__ >= 702
+#if __GLASGOW_HASKELL__ >= 702
 #if MIN_VERSION_transformers(0,3,0) && MIN_VERSION_tagged(0,6,1)
 {-# LANGUAGE Safe #-}
 #else
@@ -84,7 +84,7 @@ import Data.Proxy
 
 import Data.Void
 
-#if defined(__GLASGOW_HASKELL__) && __GLASGOW_HASKELL__ >= 702
+#if __GLASGOW_HASKELL__ >= 702
 #define GHC_GENERICS
 import GHC.Generics
 #endif
@@ -185,7 +185,7 @@ instance Contravariant f => Contravariant (Reverse f) where
   contramap f = Reverse . contramap f . getReverse
   {-# INLINE contramap #-}
 
-#if (defined(__GLASGOW_HASKELL__) && __GLASGOW_HASKELL__ >= 707) || defined(VERSION_tagged)
+#if (__GLASGOW_HASKELL__ >= 707) || defined(VERSION_tagged)
 instance Contravariant Proxy where
   contramap _ Proxy = Proxy
 #endif
