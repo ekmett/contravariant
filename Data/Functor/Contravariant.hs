@@ -40,6 +40,7 @@
 module Data.Functor.Contravariant (
   -- * Contravariant Functors
     Contravariant(..)
+  , phantom
 
   -- * Operators
   , (>$<), (>$$<)
@@ -81,6 +82,8 @@ import Data.Typeable
 import Data.Proxy
 #endif
 
+import Data.Void
+
 #if defined(__GLASGOW_HASKELL__) && __GLASGOW_HASKELL__ >= 702
 #define GHC_GENERICS
 import GHC.Generics
@@ -105,6 +108,19 @@ class Contravariant f where
   -- overridden with a more efficient version.
   (>$) :: b -> f b -> f a
   (>$) = contramap . const
+
+-- | If 'f' is both 'Functor' and 'Contravariant' then by the time you factor in the laws
+-- of each of those classes, it can't actually use it's argument in any meaningful capacity.
+--
+-- This method is surprisingly useful. Where both instances exist and are lawful we have
+-- the following laws:
+--
+-- @
+-- 'fmap' f ≡ 'phantom'
+-- 'contramap' f ≡ 'phantom'
+-- @
+phantom :: (Functor f, Contravariant f) => f a -> f b
+phantom x = absurd <$> contramap absurd x
 
 infixl 4 >$, >$<, >$$<
 
