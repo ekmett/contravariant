@@ -30,6 +30,7 @@ flag tagged
   manual: True
 
 library
+  hs-source-dirs: src
   build-depends:
     base < 5,
     semigroups >= 0.15.2 && < 1,
