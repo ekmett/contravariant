@@ -128,10 +128,12 @@ phantom x = absurd <$> contramap absurd x
 
 infixl 4 >$, >$<, >$$<
 
+-- | This is an infix alias for 'contramap'
 (>$<) :: Contravariant f => (a -> b) -> f b -> f a
 (>$<) = contramap
 {-# INLINE (>$<) #-}
 
+-- | This is an infix version of 'contramap' with the arguments flipped.
 (>$$<) :: Contravariant f => f b -> (a -> b) -> f a
 (>$$<) = flip contramap
 {-# INLINE (>$$<) #-}
@@ -229,7 +231,27 @@ instance Monoid (Comparison a) where
 defaultComparison :: Ord a => Comparison a
 defaultComparison = Comparison compare
 
--- | Define an equivalence relation
+-- | This data type represents an equivalence relation.
+--
+-- Equivalence relations are expected to satisfy three laws:
+--
+-- __Reflexivity__:
+--
+-- @
+-- 'getEquivalence' f a a = True
+-- @
+--
+-- __Symmetry__:
+-- 
+-- @
+-- 'getEquivalence' f a b = 'getEquivalence' f b a
+-- @
+--
+-- __Transitivity__:
+--
+-- If @'getEquivalence' f a b@ and @'getEquivalence' f b c@ are both 'True' then so is @'getEquivalence' f a c@
+--
+-- The types alone do not enforce these laws, so you'll have to check them yourself.
 newtype Equivalence a = Equivalence { getEquivalence :: a -> a -> Bool }
 #ifdef LANGUAGE_DeriveDataTypeable
   deriving Typeable
@@ -251,6 +273,8 @@ instance Monoid (Equivalence a) where
   mappend (Equivalence p) (Equivalence q) = Equivalence $ \a b -> p a b && q a b
 
 -- | Check for equivalence with '=='
+--
+-- Note: The instances for 'Double' and 'Float' violate reflexivity for @NaN@.
 defaultEquivalence :: Eq a => Equivalence a
 defaultEquivalence = Equivalence (==)
 
