@@ -49,7 +49,7 @@ library
     build-depends: tagged >= 0.4.4 && < 1
 
   if flag(semigroups)
-    build-depends: semigroups >= 0.15.2 && < 1,
+    build-depends: semigroups >= 0.15.2 && < 1
 
   if impl(ghc >= 7.4 && < 7.6)
     build-depends: ghc-prim
