@@ -8,7 +8,11 @@ module Data.Functor.Contravariant.Divisible
   ) where
 
 import Data.Functor.Contravariant
+
+#if __GLASGOW_HASKELL__ < 710
 import Data.Monoid
+#endif
+
 import Data.Void
 
 #if MIN_VERSION_foreign_var

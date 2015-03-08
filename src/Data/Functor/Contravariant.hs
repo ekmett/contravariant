@@ -72,7 +72,9 @@ import Data.Functor.Constant
 import Data.Functor.Compose
 import Data.Functor.Reverse
 
+#if __GLASGOW_HASKELL__ < 710
 import Data.Monoid (Monoid(..))
+#endif
 
 #ifdef MIN_VERSION_semigroups
 import Data.Semigroup (Semigroup(..))

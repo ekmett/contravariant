@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 -- |
 -- Module      :  Data.Functor.Contravariant.Compose
 -- Copyright   :  (c) Edward Kmett 2010
@@ -16,7 +17,11 @@ module Data.Functor.Contravariant.Compose
   ) where
 
 import Control.Arrow
+
+#if __GLASGOW_HASKELL__ < 710
 import Control.Applicative
+#endif
+
 import Data.Functor.Contravariant
 import Data.Functor.Contravariant.Divisible
 
