@@ -1,3 +1,7 @@
+1.2.2.1
+-------
+* Fixed redundant import warnings on GHC 7.10.
+
 1.2.2
 -----
 * Added `foreign-var` support.
