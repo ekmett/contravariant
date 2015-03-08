@@ -1,3 +1,7 @@
+1.2.2
+-----
+* Added `foreign-var` support.
+
 1.2.1
 -----
 * Added `phantom` to `Data.Functor.Contravariant`. This combinator was formerly called `coerce` in the `lens` package, but

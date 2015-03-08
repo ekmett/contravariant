@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 module Data.Functor.Contravariant.Divisible
   (
   -- * Contravariant Applicative
@@ -9,6 +10,10 @@ module Data.Functor.Contravariant.Divisible
 import Data.Functor.Contravariant
 import Data.Monoid
 import Data.Void
+
+#if MIN_VERSION_foreign_var
+import Foreign.Var
+#endif
 
 --------------------------------------------------------------------------------
 -- * Contravariant Applicative
@@ -77,7 +82,6 @@ divided = divide id
 conquered :: Divisible f => f ()
 conquered = conquer
 
-
 -- |
 -- This is the divisible analogue of 'liftA'. It gives a viable default definition for 'contramap' in terms
 -- of the members of 'Divisible'.
@@ -109,6 +113,13 @@ instance Divisible Predicate where
   divide f (Predicate g) (Predicate h) = Predicate $ \a -> case f a of
     (b, c) -> g b && h c
   conquer = Predicate $ const True
+
+#if MIN_VERSION_foreign_var
+instance Divisible SettableVar where
+  divide k (SettableVar l) (SettableVar r) = SettableVar $ \ a -> case k a of
+    (b, c) -> l b >> r c
+  conquer = SettableVar $ \_ -> return ()
+#endif
 
 --------------------------------------------------------------------------------
 -- * Contravariant Alternative
@@ -177,3 +188,11 @@ instance Decidable Predicate where
 instance Monoid r => Decidable (Op r) where
   lose f = Op $ absurd . f
   choose f (Op g) (Op h) = Op $ either g h . f
+
+#if MIN_VERSION_foreign_var
+instance Decidable SettableVar where
+  lose k = SettableVar (absurd . k)
+  choose k (SettableVar l) (SettableVar r) = SettableVar $ \ a -> case k a of
+    Left b -> l b
+    Right c -> r c
+#endif

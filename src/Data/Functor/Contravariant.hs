@@ -88,6 +88,10 @@ import Data.Proxy
 
 import Data.Void
 
+#ifdef MIN_VERSION_foreign_var
+import Foreign.Var
+#endif
+
 #if __GLASGOW_HASKELL__ >= 702
 #define GHC_GENERICS
 import GHC.Generics
@@ -190,6 +194,12 @@ instance Contravariant f => Contravariant (Backwards f) where
 instance Contravariant f => Contravariant (Reverse f) where
   contramap f = Reverse . contramap f . getReverse
   {-# INLINE contramap #-}
+
+#ifdef MIN_VERSION_foreign_var
+instance Contravariant SettableVar where
+  contramap f (SettableVar k) = SettableVar (k . f)
+  {-# INLINE contramap #-}
+#endif
 
 #if (__GLASGOW_HASKELL__ >= 707) || defined(VERSION_tagged)
 instance Contravariant Proxy where

@@ -1,6 +1,6 @@
 name:          contravariant
 category:      Control, Data
-version:       1.2.1
+version:       1.2.2
 license:       BSD3
 cabal-version: >= 1.6
 license-file:  LICENSE
@@ -37,19 +37,30 @@ flag semigroups
   default: True
   manual: True
 
+flag foreign-var
+  description:
+    You can disable the use of the `foreign-var` package on older versons of GHC using `-f-foreign-var`.
+    .
+    Disabling this is an unsupported configuration, but it may be useful for accelerating builds in sandboxes for expert users.
+  default: True
+  manual: True
+
 library
   hs-source-dirs: src
   build-depends:
-    base < 5,
-    transformers >= 0.2 && < 0.5,
-    transformers-compat >= 0.3 && < 1,
-    void >= 0.6 && < 1
+    base                              < 5,
+    transformers        >= 0.2 &&     < 0.5,
+    transformers-compat >= 0.3 &&     < 1,
+    void                >= 0.6 &&     < 1
 
   if flag(tagged) && !impl(ghc >= 7.7)
     build-depends: tagged >= 0.4.4 && < 1
 
   if flag(semigroups)
     build-depends: semigroups >= 0.15.2 && < 1
+
+  if flag(foreign-var)
+    build-depends: foreign-var < 1
 
   if impl(ghc >= 7.4 && < 7.6)
     build-depends: ghc-prim
