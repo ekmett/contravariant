@@ -66,6 +66,8 @@ import Control.Applicative.Backwards
 
 import Control.Category
 
+import Data.Function (on)
+
 import Data.Functor.Product
 import Data.Functor.Sum
 import Data.Functor.Constant
@@ -231,7 +233,7 @@ newtype Comparison a = Comparison { getComparison :: a -> a -> Ordering }
 -- apply its function argument to each input to each input to the
 -- comparison function.
 instance Contravariant Comparison where
-  contramap f g = Comparison $ \a b -> getComparison g (f a) (f b)
+  contramap f g = Comparison $ getComparison g `on` f
 
 #ifdef MIN_VERSION_semigroups
 instance Semigroup (Comparison a) where
@@ -276,7 +278,7 @@ newtype Equivalence a = Equivalence { getEquivalence :: a -> a -> Bool }
 -- apply the contramapped function to each input to the equivalence
 -- relation.
 instance Contravariant Equivalence where
-  contramap f g = Equivalence $ \a b -> getEquivalence g (f a) (f b)
+  contramap f g = Equivalence $ getEquivalence g `on` f
 
 #ifdef MIN_VERSION_semigroups
 instance Semigroup (Equivalence a) where
