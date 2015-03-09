@@ -15,8 +15,8 @@ import Data.Monoid
 
 import Data.Void
 
-#if MIN_VERSION_foreign_var
-import Foreign.Var
+#if MIN_VERSION_StateVar
+import Data.StateVar
 #endif
 
 --------------------------------------------------------------------------------
@@ -118,11 +118,11 @@ instance Divisible Predicate where
     (b, c) -> g b && h c
   conquer = Predicate $ const True
 
-#if MIN_VERSION_foreign_var
-instance Divisible SettableVar where
-  divide k (SettableVar l) (SettableVar r) = SettableVar $ \ a -> case k a of
+#if MIN_VERSION_StateVar
+instance Divisible SettableStateVar where
+  divide k (SettableStateVar l) (SettableStateVar r) = SettableStateVar $ \ a -> case k a of
     (b, c) -> l b >> r c
-  conquer = SettableVar $ \_ -> return ()
+  conquer = SettableStateVar $ \_ -> return ()
 #endif
 
 --------------------------------------------------------------------------------
@@ -193,10 +193,10 @@ instance Monoid r => Decidable (Op r) where
   lose f = Op $ absurd . f
   choose f (Op g) (Op h) = Op $ either g h . f
 
-#if MIN_VERSION_foreign_var
+#if MIN_VERSION_StateVar
 instance Decidable SettableVar where
-  lose k = SettableVar (absurd . k)
-  choose k (SettableVar l) (SettableVar r) = SettableVar $ \ a -> case k a of
+  lose k = SettableStateVar (absurd . k)
+  choose k (SettableStateVar l) (SettableStateVar r) = SettableStateVar $ \ a -> case k a of
     Left b -> l b
     Right c -> r c
 #endif

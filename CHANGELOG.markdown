@@ -1,3 +1,7 @@
+1.3
+---
+* We've merged the `foreign-var` and `StateVar` packages. Transferring support to `StateVar`.
+
 1.2.2.1
 -------
 * Fixed redundant import warnings on GHC 7.10.

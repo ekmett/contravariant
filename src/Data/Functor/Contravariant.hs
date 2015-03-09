@@ -92,8 +92,8 @@ import Data.Proxy
 
 import Data.Void
 
-#ifdef MIN_VERSION_foreign_var
-import Foreign.Var
+#ifdef MIN_VERSION_StateVar
+import Data.StateVar
 #endif
 
 #if __GLASGOW_HASKELL__ >= 702
@@ -199,9 +199,9 @@ instance Contravariant f => Contravariant (Reverse f) where
   contramap f = Reverse . contramap f . getReverse
   {-# INLINE contramap #-}
 
-#ifdef MIN_VERSION_foreign_var
-instance Contravariant SettableVar where
-  contramap f (SettableVar k) = SettableVar (k . f)
+#ifdef MIN_VERSION_StateVar
+instance Contravariant SettableStateVar where
+  contramap f (SettableStateVar k) = SettableStateVar (k . f)
   {-# INLINE contramap #-}
 #endif
 
