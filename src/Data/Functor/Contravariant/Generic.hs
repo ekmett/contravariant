@@ -10,6 +10,20 @@
 #if __GLASGOW_HASKELL__ >= 706
 {-# LANGUAGE PolyKinds #-}
 #endif
+-----------------------------------------------------------------------------
+-- |
+-- Module      :  Data.Functor.Contravariant.Generic
+-- Copyright   :  (C) 2007-2015 Edward Kmett
+-- License     :  BSD-style (see the file LICENSE)
+--
+-- Maintainer  :  Edward Kmett <ekmett@gmail.com>
+-- Stability   :  provisional
+-- Portability :  portable
+--
+--
+--
+----------------------------------------------------------------------------
+
 module Data.Functor.Contravariant.Generic
   ( Deciding(..)
   , Deciding1(..)
@@ -19,7 +33,19 @@ import Data.Functor.Contravariant
 import Data.Functor.Contravariant.Divisible
 import GHC.Generics
 
--- | Machinery for deconstructing an arbitrary 'Generic' instance using a 'Decidable' 'Contravariant' functor.
+-- | This provides machinery for deconstructing an arbitrary 'Generic' instance using a 'Decidable' 'Contravariant' functor.
+--
+-- /Examples:/
+--
+-- @
+-- gcompare :: 'Deciding' 'Ord' a => a -> a -> 'Ordering'
+-- gcompare = 'getComparison' $ 'deciding' (Proxy :: Proxy 'Ord') ('Comparison' 'compare')
+-- @
+--
+-- @
+-- geq :: 'Deciding' 'Eq' a => a -> a -> 'Bool'
+-- geq = 'getEquivalence' $ 'deciding' (Proxy :: Proxy 'Eq') ('Equivalence' ('=='))
+-- @
 class (Generic a, GDeciding q (Rep a)) => Deciding q a where
 #ifndef HLINT
   deciding :: Decidable f => p q -> (forall b. q b => f b) -> f a
@@ -28,7 +54,19 @@ class (Generic a, GDeciding q (Rep a)) => Deciding q a where
 instance (Generic a, GDeciding q (Rep a)) => Deciding q a  where
   deciding p q = contramap from $ gdeciding p q
 
--- | Machinery for deconstructing an arbitrary 'Generic1' instance using a 'Decidable' 'Contravariant' functor.
+-- | This provides machinery for deconstructing an arbitrary 'Generic1' instance using a 'Decidable' 'Contravariant' functor.
+--
+-- /Examples:/
+--
+-- @
+-- gcompare1 :: 'Deciding1' 'Ord' f => (a -> a -> 'Ordering') -> f a -> f a -> 'Ordering'
+-- gcompare1 f = 'getComparison' $ 'deciding1' (Proxy :: Proxy 'Ord') ('Comparison' compare) ('Comparison' f)
+-- @
+--
+-- @
+-- geq1 :: 'Deciding1' 'Eq' f => (a -> a -> 'Bool') -> f a -> f a -> 'Bool'
+-- geq1 f = 'getEquivalence' $ 'deciding1' (Proxy :: Proxy 'Eq') ('Equivalence' ('==')) ('Equivalence' f)
+-- @
 class (Generic1 t, GDeciding1 q (Rep1 t)) => Deciding1 q t where
 #ifndef HLINT
   deciding1 :: Decidable f => p q -> (forall b. q b => f b) -> f a -> f (t a)
@@ -92,5 +130,5 @@ instance GDeciding1 q Par1 where
 
 -- instance GDeciding1 q f => GDeciding1 q (Rec1 f) where gdeciding1 p q r = contramap unRec1 (gdeciding1 p q r)
 
-instance Deciding1 q f => GDeciding1 q (Rec1 f) where 
+instance Deciding1 q f => GDeciding1 q (Rec1 f) where
   gdeciding1 p q r = contramap unRec1 (deciding1 p q r)
