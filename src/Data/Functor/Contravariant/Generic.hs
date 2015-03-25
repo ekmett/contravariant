@@ -56,7 +56,7 @@ instance (GDeciding q f, GDeciding q g) => GDeciding q (f :+: g) where
 
 #ifndef HLINT
 instance q p => GDeciding q (K1 i p) where
-#endif HLINT
+#endif
   gdeciding _ q = contramap unK1 q
 
 instance GDeciding q f => GDeciding q (M1 i c f) where
