@@ -21,20 +21,26 @@ import GHC.Generics
 
 -- | Machinery for deconstructing an arbitrary 'Generic' instance using a 'Decidable' 'Contravariant' functor.
 class (Generic a, GDeciding q (Rep a)) => Deciding q a where
+#ifndef HLINT
   deciding :: Decidable f => p q -> (forall b. q b => f b) -> f a
+#endif
 
 instance (Generic a, GDeciding q (Rep a)) => Deciding q a  where
   deciding p q = contramap from $ gdeciding p q
 
 -- | Machinery for deconstructing an arbitrary 'Generic1' instance using a 'Decidable' 'Contravariant' functor.
 class (Generic1 t, GDeciding1 q (Rep1 t)) => Deciding1 q t where
+#ifndef HLINT
   deciding1 :: Decidable f => p q -> (forall b. q b => f b) -> f a -> f (t a)
+#endif
 
 instance (Generic1 t, GDeciding1 q (Rep1 t)) => Deciding1 q t where
   deciding1 p q r = contramap from1 $ gdeciding1 p q r
 
 class GDeciding q t where
+#ifndef HLINT
   gdeciding :: Decidable f => p q -> (forall b. q b => f b) -> f (t a)
+#endif
 
 instance GDeciding q U1 where
   gdeciding _ _ = conquer
@@ -55,7 +61,9 @@ instance GDeciding q f => GDeciding q (M1 i c f) where
   gdeciding p q = contramap unM1 (gdeciding p q)
 
 class GDeciding1 q t where
+#ifndef HLINT
   gdeciding1 :: Decidable f => p q -> (forall b. q b => f b) -> f a -> f (t a)
+#endif
 
 instance GDeciding1 q U1 where
   gdeciding1 _ _ _ = conquer
