@@ -1,4 +1,16 @@
 {-# LANGUAGE CPP #-}
+-----------------------------------------------------------------------------
+-- |
+-- Module      :  Data.Functor.Contravariant.Divisible
+-- Copyright   :  (C) 2014-2015 Edward Kmett
+-- License     :  BSD-style (see the file LICENSE)
+--
+-- Maintainer  :  Edward Kmett <ekmett@gmail.com>
+-- Stability   :  provisional
+-- Portability :  portable
+--
+-- This module supplies contravariant analogues to the 'Applicative' and 'Alternative' classes.
+----------------------------------------------------------------------------
 module Data.Functor.Contravariant.Divisible
   (
   -- * Contravariant Applicative
