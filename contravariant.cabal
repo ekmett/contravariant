@@ -16,6 +16,7 @@ build-type:    Simple
 extra-source-files:
   .travis.yml
   CHANGELOG.markdown
+  HLint.hs
 
 source-repository head
   type: git

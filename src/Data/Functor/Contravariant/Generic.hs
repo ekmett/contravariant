@@ -54,7 +54,9 @@ instance (GDeciding q f, GDeciding q g) => GDeciding q (f :*: g) where
 instance (GDeciding q f, GDeciding q g) => GDeciding q (f :+: g) where
   gdeciding p q = choose (\ xs -> case xs of L1 a -> Left a; R1 a -> Right a) (gdeciding p q) (gdeciding p q)
 
+#ifndef HLINT
 instance q p => GDeciding q (K1 i p) where
+#endif HLINT
   gdeciding _ q = contramap unK1 q
 
 instance GDeciding q f => GDeciding q (M1 i c f) where
@@ -77,7 +79,9 @@ instance (GDeciding1 q f, GDeciding1 q g) => GDeciding1 q (f :*: g) where
 instance (GDeciding1 q f, GDeciding1 q g) => GDeciding1 q (f :+: g) where
   gdeciding1 p q r = choose (\ xs -> case xs of L1 a -> Left a; R1 a -> Right a) (gdeciding1 p q r) (gdeciding1 p q r)
 
+#ifndef HLINT
 instance q p => GDeciding1 q (K1 i p) where
+#endif
   gdeciding1 _ q _ = contramap unK1 q
 
 instance GDeciding1 q f => GDeciding1 q (M1 i c f) where
