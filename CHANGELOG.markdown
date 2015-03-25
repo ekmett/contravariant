@@ -1,3 +1,7 @@
+1.3.1
+-----
+* Added `Data.Functor.Contravariant.Generic` on GHC 7.4+
+
 1.3
 ---
 * We've merged the `foreign-var` and `StateVar` packages. Transferring support to `StateVar`.
