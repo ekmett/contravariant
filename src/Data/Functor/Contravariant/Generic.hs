@@ -17,8 +17,8 @@
 -- License     :  BSD-style (see the file LICENSE)
 --
 -- Maintainer  :  Edward Kmett <ekmett@gmail.com>
--- Stability   :  provisional
--- Portability :  portable
+-- Stability   :  experimental
+-- Portability :  ConstraintKinds
 --
 --
 --
