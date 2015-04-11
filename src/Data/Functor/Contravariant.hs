@@ -230,8 +230,7 @@ newtype Comparison a = Comparison { getComparison :: a -> a -> Ordering }
 #endif
 
 -- | A 'Comparison' is a 'Contravariant' 'Functor', because 'contramap' can
--- apply its function argument to each input to each input to the
--- comparison function.
+-- apply its function argument to each input to the comparison function.
 instance Contravariant Comparison where
   contramap f g = Comparison $ on (getComparison g) f
 
