@@ -63,7 +63,7 @@ library
   if flag(StateVar)
     build-depends: StateVar >= 1.1 && < 1.2
 
-  if impl(ghc >= 7.4 && < 7.6)
+  if impl(ghc >= 7.2 && < 7.6)
     build-depends: ghc-prim
 
   exposed-modules:
