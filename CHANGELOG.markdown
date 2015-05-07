@@ -1,3 +1,7 @@
+1.3.1.1
+-------
+* Fixed builds on GHC 7.2
+
 1.3.1
 -----
 * Added `Data.Functor.Contravariant.Generic` on GHC 7.4+
