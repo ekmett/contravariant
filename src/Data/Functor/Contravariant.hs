@@ -14,7 +14,7 @@
 #define MIN_VERSION_base(x,y,z) 1
 #endif
 
-#if __GLASGOW_HASKELL__ >= 702
+#if __GLASGOW_HASKELL__ >= 704
 #if MIN_VERSION_transformers(0,3,0) && MIN_VERSION_tagged(0,6,1)
 {-# LANGUAGE Safe #-}
 #else
@@ -258,7 +258,7 @@ defaultComparison = Comparison compare
 -- @
 --
 -- __Symmetry__:
--- 
+--
 -- @
 -- 'getEquivalence' f a b = 'getEquivalence' f b a
 -- @
