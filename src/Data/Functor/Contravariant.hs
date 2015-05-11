@@ -22,6 +22,8 @@
 #endif
 #endif
 
+{-# OPTIONS_GHC -fno-warn-deprecations #-}
+
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Data.Functor.Contravariant
@@ -66,6 +68,19 @@ import Control.Applicative.Backwards
 
 import Control.Category
 
+import Control.Monad.Trans.Error
+import Control.Monad.Trans.Except
+import Control.Monad.Trans.Identity
+import Control.Monad.Trans.List
+import Control.Monad.Trans.Maybe
+import qualified Control.Monad.Trans.RWS.Lazy as Lazy
+import qualified Control.Monad.Trans.RWS.Strict as Strict
+import Control.Monad.Trans.Reader
+import qualified Control.Monad.Trans.State.Lazy as Lazy
+import qualified Control.Monad.Trans.State.Strict as Strict
+import qualified Control.Monad.Trans.Writer.Lazy as Lazy
+import qualified Control.Monad.Trans.Writer.Strict as Strict
+
 import Data.Function (on)
 
 import Data.Functor.Product
@@ -74,7 +89,9 @@ import Data.Functor.Constant
 import Data.Functor.Compose
 import Data.Functor.Reverse
 
-#if __GLASGOW_HASKELL__ < 710
+#if MIN_VERSION_base(4,8,0)
+import Data.Monoid (Alt(..))
+#else
 import Data.Monoid (Monoid(..))
 #endif
 
@@ -146,6 +163,11 @@ infixl 4 >$, >$<, >$$<
 (>$$<) = flip contramap
 {-# INLINE (>$$<) #-}
 
+#if MIN_VERSION_base(4,8,0)
+instance Contravariant f => Contravariant (Alt f) where
+  contramap f = Alt . contramap f . getAlt
+#endif
+
 #ifdef GHC_GENERICS
 instance Contravariant V1 where
   contramap _ x = x `seq` undefined
@@ -173,6 +195,46 @@ instance (Contravariant f, Contravariant g) => Contravariant (f :+: g) where
   contramap f (L1 xs) = L1 (contramap f xs)
   contramap f (R1 ys) = R1 (contramap f ys)
 #endif
+
+instance Contravariant m => Contravariant (ErrorT e m) where
+  contramap f = ErrorT . contramap (fmap f) . runErrorT
+
+instance Contravariant m => Contravariant (ExceptT e m) where
+  contramap f = ExceptT . contramap (fmap f) . runExceptT
+
+instance Contravariant f => Contravariant (IdentityT f) where
+  contramap f = IdentityT . contramap f . runIdentityT
+
+instance Contravariant m => Contravariant (ListT m) where
+  contramap f = ListT . contramap (fmap f) . runListT
+
+instance Contravariant m => Contravariant (MaybeT m) where
+  contramap f = MaybeT . contramap (fmap f) . runMaybeT
+
+instance Contravariant m => Contravariant (Lazy.RWST r w s m) where
+  contramap f m = Lazy.RWST $ \r s ->
+    contramap (\ ~(a, s', w) -> (f a, s', w)) $ Lazy.runRWST m r s
+
+instance Contravariant m => Contravariant (Strict.RWST r w s m) where
+  contramap f m = Strict.RWST $ \r s ->
+    contramap (\ (a, s', w) -> (f a, s', w)) $ Strict.runRWST m r s
+
+instance Contravariant m => Contravariant (ReaderT r m) where
+  contramap f = ReaderT . fmap (contramap f) . runReaderT
+
+instance Contravariant m => Contravariant (Lazy.StateT s m) where
+  contramap f m = Lazy.StateT $ \s ->
+    contramap (\ ~(a, s') -> (f a, s')) $ Lazy.runStateT m s
+
+instance Contravariant m => Contravariant (Strict.StateT s m) where
+  contramap f m = Strict.StateT $ \s ->
+    contramap (\ (a, s') -> (f a, s')) $ Strict.runStateT m s
+
+instance Contravariant m => Contravariant (Lazy.WriterT w m) where
+  contramap f = Lazy.mapWriterT $ contramap $ \ ~(a, w) -> (f a, w)
+
+instance Contravariant m => Contravariant (Strict.WriterT w m) where
+  contramap f = Strict.mapWriterT $ contramap $ \ (a, w) -> (f a, w)
 
 instance (Contravariant f, Contravariant g) => Contravariant (Sum f g) where
   contramap f (InL xs) = InL (contramap f xs)
