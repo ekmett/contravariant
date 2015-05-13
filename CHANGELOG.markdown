@@ -1,3 +1,7 @@
+1.3.2
+-----
+* Add `($<)` operator
+
 1.3.1.1
 -------
 * Fixed builds on GHC 7.2

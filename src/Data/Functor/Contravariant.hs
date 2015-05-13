@@ -43,7 +43,7 @@ module Data.Functor.Contravariant (
   , phantom
 
   -- * Operators
-  , (>$<), (>$$<)
+  , (>$<), (>$$<), ($<)
 
   -- * Predicates
   , Predicate(..)
@@ -90,8 +90,6 @@ import Data.Typeable
 import Data.Proxy
 #endif
 
-import Data.Void
-
 #ifdef MIN_VERSION_StateVar
 import Data.StateVar
 #endif
@@ -132,9 +130,14 @@ class Contravariant f where
 -- 'contramap' f ≡ 'phantom'
 -- @
 phantom :: (Functor f, Contravariant f) => f a -> f b
-phantom x = absurd <$> contramap absurd x
+phantom x = () <$ x $< ()
 
-infixl 4 >$, >$<, >$$<
+infixl 4 >$, $<, >$<, >$$<
+
+-- | This is '>$' with its arguments flipped.
+($<) :: Contravariant f => f b -> b -> f a
+($<) = flip (>$)
+{-# INLINE ($<) #-}
 
 -- | This is an infix alias for 'contramap'
 (>$<) :: Contravariant f => (a -> b) -> f b -> f a
