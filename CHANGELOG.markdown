@@ -1,3 +1,7 @@
+1.3.3
+-----
+* Add `instance Monoid m => Divisible (Const m)`
+
 1.3.2
 -----
 * Add `($<)` operator

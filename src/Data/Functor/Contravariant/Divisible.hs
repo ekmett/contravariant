@@ -19,6 +19,7 @@ module Data.Functor.Contravariant.Divisible
   , Decidable(..), chosen, lost
   ) where
 
+import Control.Applicative
 import Data.Functor.Contravariant
 
 #if __GLASGOW_HASKELL__ < 710
@@ -129,6 +130,10 @@ instance Divisible Predicate where
   divide f (Predicate g) (Predicate h) = Predicate $ \a -> case f a of
     (b, c) -> g b && h c
   conquer = Predicate $ const True
+
+instance Monoid m => Divisible (Const m) where
+  divide _ (Const a) (Const b) = Const (mappend a b)
+  conquer = Const mempty
 
 #if MIN_VERSION_StateVar
 instance Divisible SettableStateVar where
