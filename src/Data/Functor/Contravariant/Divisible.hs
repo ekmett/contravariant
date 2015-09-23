@@ -94,7 +94,7 @@ divided = divide id
 -- | Redundant, but provided for symmetry.
 --
 -- @
--- 'conquered' = 'conquer
+-- 'conquered' = 'conquer'
 -- @
 conquered :: Divisible f => f ()
 conquered = conquer
