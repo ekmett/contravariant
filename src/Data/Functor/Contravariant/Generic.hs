@@ -152,8 +152,8 @@ gchoose = choose unsafeCoerce
 
 #ifndef HLINT
 instance q p => GDeciding1 q (K1 i p) where
-#endif
   gdeciding1 _ q _ = contramap unK1 q
+#endif
 
 instance GDeciding1 q f => GDeciding1 q (M1 i c f) where
   gdeciding1 p q r = contramap unM1 (gdeciding1 p q r)
