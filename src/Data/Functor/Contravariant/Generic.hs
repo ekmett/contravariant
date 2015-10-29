@@ -1,4 +1,5 @@
 {-# LANGUAGE CPP #-}
+{-# LANGUAGE Trustworthy #-}
 {-# LANGUAGE BangPatterns #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE ConstraintKinds #-}
@@ -32,6 +33,7 @@ module Data.Functor.Contravariant.Generic
 import Data.Functor.Contravariant
 import Data.Functor.Contravariant.Divisible
 import GHC.Generics
+import Unsafe.Coerce
 
 -- | This provides machinery for deconstructing an arbitrary 'Generic' instance using a 'Decidable' 'Contravariant' functor.
 --
@@ -84,13 +86,13 @@ instance GDeciding q U1 where
   gdeciding _ _ = conquer
 
 instance GDeciding q V1 where
-  gdeciding _ _ = lose (\ !_ -> error "impossible")
+  gdeciding _ _ = glose
 
 instance (GDeciding q f, GDeciding q g) => GDeciding q (f :*: g) where
-  gdeciding p q = divide (\(a :*: b) -> (a, b)) (gdeciding p q) (gdeciding p q)
+  gdeciding p q = gdivide (gdeciding p q) (gdeciding p q)
 
 instance (GDeciding q f, GDeciding q g) => GDeciding q (f :+: g) where
-  gdeciding p q = choose (\ xs -> case xs of L1 a -> Left a; R1 a -> Right a) (gdeciding p q) (gdeciding p q)
+  gdeciding p q = gchoose (gdeciding p q) (gdeciding p q)
 
 #ifndef HLINT
 instance q p => GDeciding q (K1 i p) where
@@ -109,13 +111,25 @@ instance GDeciding1 q U1 where
   gdeciding1 _ _ _ = conquer
 
 instance GDeciding1 q V1 where
-  gdeciding1 _ _ _ = lose (\ !_ -> error "impossible")
+  gdeciding1 _ _ _ = glose
 
 instance (GDeciding1 q f, GDeciding1 q g) => GDeciding1 q (f :*: g) where
-  gdeciding1 p q r = divide (\(a :*: b) -> (a, b)) (gdeciding1 p q r) (gdeciding1 p q r)
+  gdeciding1 p q r = gdivide (gdeciding1 p q r) (gdeciding1 p q r)
 
 instance (GDeciding1 q f, GDeciding1 q g) => GDeciding1 q (f :+: g) where
-  gdeciding1 p q r = choose (\ xs -> case xs of L1 a -> Left a; R1 a -> Right a) (gdeciding1 p q r) (gdeciding1 p q r)
+  gdeciding1 p q r = gchoose (gdeciding1 p q r) (gdeciding1 p q r)
+
+glose :: Decidable f => f (V1 a)
+glose = lose unsafeCoerce
+{-# INLINE glose #-}
+
+gdivide :: Divisible f => f (g a) -> f (h a) -> f ((g:*:h) a)
+gdivide = divide unsafeCoerce
+{-# INLINE gdivide #-}
+
+gchoose :: Decidable f => f (g a) -> f (h a) -> f ((g:+:h) a)
+gchoose = choose unsafeCoerce
+{-# INLINE gchoose #-}
 
 #ifndef HLINT
 instance q p => GDeciding1 q (K1 i p) where
