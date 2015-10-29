@@ -1,3 +1,7 @@
+1.4
+---
+* Improved the performance of `Deciding` at the cost of downgrading it to `Trustworthy`.
+
 1.3.3
 -----
 * Add `instance Monoid m => Divisible (Const m)`
