@@ -1,5 +1,5 @@
 {-# LANGUAGE CPP #-}
-#if __GLASGOW_HASKELL__ >= 704
+#if __GLASGOW_HASKELL__ >= 704 && !defined(SAFE)
 {-# LANGUAGE Trustworthy #-}
 #endif
 {-# LANGUAGE BangPatterns #-}
@@ -35,7 +35,9 @@ module Data.Functor.Contravariant.Generic
 import Data.Functor.Contravariant
 import Data.Functor.Contravariant.Divisible
 import GHC.Generics
+#ifndef SAFE
 import Unsafe.Coerce
+#endif
 
 -- | This provides machinery for deconstructing an arbitrary 'Generic' instance using a 'Decidable' 'Contravariant' functor.
 --
@@ -121,16 +123,30 @@ instance (GDeciding1 q f, GDeciding1 q g) => GDeciding1 q (f :*: g) where
 instance (GDeciding1 q f, GDeciding1 q g) => GDeciding1 q (f :+: g) where
   gdeciding1 p q r = gchoose (gdeciding1 p q r) (gdeciding1 p q r)
 
+
+
 glose :: Decidable f => f (V1 a)
+#ifdef SAFE
+glose = lose (\ !_ -> error "impossible")
+#else
 glose = lose unsafeCoerce
+#endif
 {-# INLINE glose #-}
 
 gdivide :: Divisible f => f (g a) -> f (h a) -> f ((g:*:h) a)
+#ifdef SAFE
+gdivide = divide (\(f:*:g) -> (f,g))
+#else
 gdivide = divide unsafeCoerce
+#endif
 {-# INLINE gdivide #-}
 
 gchoose :: Decidable f => f (g a) -> f (h a) -> f ((g:+:h) a)
+#ifdef SAFE
+gchoose = choose (\xs -> case xs of L1 a -> Left a; R1 b -> Right b)
+#else
 gchoose = choose unsafeCoerce
+#endif
 {-# INLINE gchoose #-}
 
 #ifndef HLINT
