@@ -1,4 +1,6 @@
 {-# LANGUAGE CPP #-}
+{-# LANGUAGE TypeOperators #-}
+
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Data.Functor.Contravariant.Divisible
@@ -20,16 +22,46 @@ module Data.Functor.Contravariant.Divisible
   ) where
 
 import Control.Applicative
-import Data.Functor.Contravariant
+import Control.Applicative.Backwards
+import Control.Arrow
+import Control.Monad.Trans.Error
+import Control.Monad.Trans.Except
+import Control.Monad.Trans.Identity
+import Control.Monad.Trans.List
+import Control.Monad.Trans.Maybe
+import qualified Control.Monad.Trans.RWS.Lazy as Lazy
+import qualified Control.Monad.Trans.RWS.Strict as Strict
+import Control.Monad.Trans.Reader
+import qualified Control.Monad.Trans.State.Lazy as Lazy
+import qualified Control.Monad.Trans.State.Strict as Strict
+import qualified Control.Monad.Trans.Writer.Lazy as Lazy
+import qualified Control.Monad.Trans.Writer.Strict as Strict
 
-#if __GLASGOW_HASKELL__ < 710
-import Data.Monoid
+import Data.Either
+import Data.Functor.Compose
+import Data.Functor.Constant
+import Data.Functor.Contravariant
+import Data.Functor.Product
+import Data.Functor.Reverse
+import Data.Void
+
+#if MIN_VERSION_base(4,8,0)
+import Data.Monoid (Alt(..))
+#else
+import Data.Monoid (Monoid(..))
 #endif
 
-import Data.Void
+#if MIN_VERSION_base(4,7,0) || defined(MIN_VERSION_tagged)
+import Data.Proxy
+#endif
 
 #if MIN_VERSION_StateVar
 import Data.StateVar
+#endif
+
+#if __GLASGOW_HASKELL__ >= 702
+#define GHC_GENERICS
+import GHC.Generics
 #endif
 
 --------------------------------------------------------------------------------
@@ -53,7 +85,7 @@ import Data.StateVar
 -- @
 -- delta a = (a,a)
 -- @
--- 
+--
 -- @'divide' 'delta'@ should be associative with 'conquer' as a unit
 --
 -- @
@@ -108,7 +140,7 @@ conquered = conquer
 -- @
 liftD :: Divisible f => (a -> b) -> f b -> f a
 liftD f = divide ((,) () . f) conquer
-  
+
 instance Monoid r => Divisible (Op r) where
   divide f (Op g) (Op h) = Op $ \a -> case f a of
     (b, c) -> g b `mappend` h c
@@ -135,6 +167,118 @@ instance Monoid m => Divisible (Const m) where
   divide _ (Const a) (Const b) = Const (mappend a b)
   conquer = Const mempty
 
+#if MIN_VERSION_base(4,8,0)
+instance Divisible f => Divisible (Alt f) where
+  divide f (Alt l) (Alt r) = Alt $ divide f l r
+  conquer = Alt conquer
+#endif
+
+#ifdef GHC_GENERICS
+instance Divisible U1 where
+  divide _ U1 U1 = U1
+  conquer = U1
+
+instance Divisible f => Divisible (Rec1 f) where
+  divide f (Rec1 l) (Rec1 r) = Rec1 $ divide f l r
+  conquer = Rec1 conquer
+
+instance Divisible f => Divisible (M1 i c f) where
+  divide f (M1 l) (M1 r) = M1 $ divide f l r
+  conquer = M1 conquer
+
+instance (Divisible f, Divisible g) => Divisible (f :*: g) where
+  divide f (l1 :*: r1) (l2 :*: r2) = divide f l1 l2 :*: divide f r1 r2
+  conquer = conquer :*: conquer
+
+instance (Applicative f, Divisible g) => Divisible (f :.: g) where
+  divide f (Comp1 l) (Comp1 r) = Comp1 (divide f <$> l <*> r)
+  conquer = Comp1 $ pure conquer
+#endif
+
+instance Divisible f => Divisible (Backwards f) where
+  divide f (Backwards l) (Backwards r) = Backwards $ divide f l r
+  conquer = Backwards conquer
+
+-- instance Divisible m => Divisible (ErrorT e m) where
+--   divide f (ErrorT l) (ErrorT r) = ErrorT $ divide (funzip . fmap f) l r
+--   conquer = ErrorT conquer
+
+instance Divisible m => Divisible (ExceptT e m) where
+  divide f (ExceptT l) (ExceptT r) = ExceptT $ divide (funzip . fmap f) l r
+  conquer = ExceptT conquer
+
+instance Divisible f => Divisible (IdentityT f) where
+  divide f (IdentityT l) (IdentityT r) = IdentityT $ divide f l r
+  conquer = IdentityT conquer
+
+instance Divisible m => Divisible (ListT m) where
+  divide f (ListT l) (ListT r) = ListT $ divide (funzip . map f) l r
+  conquer = ListT conquer
+
+instance Divisible m => Divisible (MaybeT m) where
+  divide f (MaybeT l) (MaybeT r) = MaybeT $ divide (funzip . fmap f) l r
+  conquer = MaybeT conquer
+
+instance Divisible m => Divisible (ReaderT r m) where
+  divide abc (ReaderT rmb) (ReaderT rmc) = ReaderT $ \r -> divide abc (rmb r) (rmc r)
+  conquer = ReaderT $ \_ -> conquer
+
+instance Divisible m => Divisible (Lazy.RWST r w s m) where
+  divide abc (Lazy.RWST rsmb) (Lazy.RWST rsmc) = Lazy.RWST $ \r s ->
+    divide (\ ~(a, s', w) -> case abc a of
+                                  ~(b, c) -> ((b, s', w), (c, s', w)))
+           (rsmb r s) (rsmc r s)
+  conquer = Lazy.RWST $ \_ _ -> conquer
+
+instance Divisible m => Divisible (Strict.RWST r w s m) where
+  divide abc (Strict.RWST rsmb) (Strict.RWST rsmc) = Strict.RWST $ \r s ->
+    divide (\(a, s', w) -> case abc a of
+                                (b, c) -> ((b, s', w), (c, s', w)))
+           (rsmb r s) (rsmc r s)
+  conquer = Strict.RWST $ \_ _ -> conquer
+
+instance Divisible m => Divisible (Lazy.StateT s m) where
+  divide f (Lazy.StateT l) (Lazy.StateT r) = Lazy.StateT $ \s ->
+    divide (lazyFanout f) (l s) (r s)
+  conquer = Lazy.StateT $ \_ -> conquer
+
+instance Divisible m => Divisible (Strict.StateT s m) where
+  divide f (Strict.StateT l) (Strict.StateT r) = Strict.StateT $ \s ->
+    divide (strictFanout f) (l s) (r s)
+  conquer = Strict.StateT $ \_ -> conquer
+
+instance Divisible m => Divisible (Lazy.WriterT w m) where
+  divide f (Lazy.WriterT l) (Lazy.WriterT r) = Lazy.WriterT $
+    divide (lazyFanout f) l r
+  conquer = Lazy.WriterT conquer
+
+instance Divisible m => Divisible (Strict.WriterT w m) where
+  divide f (Strict.WriterT l) (Strict.WriterT r) = Strict.WriterT $
+    divide (strictFanout f) l r
+  conquer = Strict.WriterT conquer
+
+instance (Applicative f, Divisible g) => Divisible (Compose f g) where
+  divide f (Compose l) (Compose r) = Compose (divide f <$> l <*> r)
+  conquer = Compose $ pure conquer
+
+instance Monoid m => Divisible (Constant m) where
+  divide _ (Constant l) (Constant r) = Constant $ mappend l r
+  conquer = Constant mempty
+
+instance (Divisible f, Divisible g) => Divisible (Product f g) where
+  divide f (Pair l1 r1) (Pair l2 r2) = Pair (divide f l1 l2) (divide f r1 r2)
+  conquer = Pair conquer conquer
+
+instance Divisible f => Divisible (Reverse f) where
+  divide f (Reverse l) (Reverse r) = Reverse $ divide f l r
+  conquer = Reverse conquer
+
+#if MIN_VERSION_base(4,7,0) || defined(MIN_VERSION_tagged)
+instance Divisible Proxy where
+  divide _ Proxy Proxy = Proxy
+  conquer = Proxy
+#endif
+
 #if MIN_VERSION_StateVar
 instance Divisible SettableStateVar where
   divide k (SettableStateVar l) (SettableStateVar r) = SettableStateVar $ \ a -> case k a of
@@ -142,13 +286,24 @@ instance Divisible SettableStateVar where
   conquer = SettableStateVar $ \_ -> return ()
 #endif
 
+lazyFanout :: (a -> (b, c)) -> (a, s) -> ((b, s), (c, s))
+lazyFanout f ~(a, s) = case f a of
+  ~(b, c) -> ((b, s), (c, s))
+
+strictFanout :: (a -> (b, c)) -> (a, s) -> ((b, s), (c, s))
+strictFanout f (a, s) = case f a of
+  (b, c) -> ((b, s), (c, s))
+
+funzip :: Functor f => f (a, b) -> (f a, f b)
+funzip = fmap fst &&& fmap snd
+
 --------------------------------------------------------------------------------
 -- * Contravariant Alternative
 --------------------------------------------------------------------------------
 
 -- |
 --
--- A 'Divisible' contravariant functor is a monoid object in the category of presheaves 
+-- A 'Divisible' contravariant functor is a monoid object in the category of presheaves
 -- from Hask to Hask, equipped with Day convolution mapping the cartesian product of the
 -- source to the Cartesian product of the target.
 --
@@ -209,6 +364,123 @@ instance Decidable Predicate where
 instance Monoid r => Decidable (Op r) where
   lose f = Op $ absurd . f
   choose f (Op g) (Op h) = Op $ either g h . f
+
+#if MIN_VERSION_base(4,8,0)
+instance Decidable f => Decidable (Alt f) where
+  lose = Alt . lose
+  choose f (Alt l) (Alt r) = Alt $ choose f l r
+#endif
+
+#ifdef GHC_GENERICS
+instance Decidable U1 where
+  lose _ = U1
+  choose _ U1 U1 = U1
+
+instance Decidable f => Decidable (Rec1 f) where
+  lose = Rec1 . lose
+  choose f (Rec1 l) (Rec1 r) = Rec1 $ choose f l r
+
+instance Decidable f => Decidable (M1 i c f) where
+  lose = M1 . lose
+  choose f (M1 l) (M1 r) = M1 $ choose f l r
+
+instance (Decidable f, Decidable g) => Decidable (f :*: g) where
+  lose f = lose f :*: lose f
+  choose f (l1 :*: r1) (l2 :*: r2) = choose f l1 l2 :*: choose f r1 r2
+
+instance (Applicative f, Decidable g) => Decidable (f :.: g) where
+  lose = Comp1 . pure . lose
+  choose f (Comp1 l) (Comp1 r) = Comp1 (choose f <$> l <*> r)
+#endif
+
+instance Decidable f => Decidable (Backwards f) where
+  lose = Backwards . lose
+  choose f (Backwards l) (Backwards r) = Backwards $ choose f l r
+
+instance Decidable f => Decidable (IdentityT f) where
+  lose = IdentityT . lose
+  choose f (IdentityT l) (IdentityT r) = IdentityT $ choose f l r
+
+instance Decidable m => Decidable (ReaderT r m) where
+  lose f = ReaderT $ \_ -> lose f
+  choose abc (ReaderT rmb) (ReaderT rmc) = ReaderT $ \r -> choose abc (rmb r) (rmc r)
+
+instance Decidable m => Decidable (Lazy.RWST r w s m) where
+  lose f = Lazy.RWST $ \_ _ -> contramap (\ ~(a, _, _) -> a) (lose f)
+  choose abc (Lazy.RWST rsmb) (Lazy.RWST rsmc) = Lazy.RWST $ \r s ->
+    choose (\ ~(a, s', w) -> either (Left  . betuple3 s' w)
+                                    (Right . betuple3 s' w)
+                                    (abc a))
+           (rsmb r s) (rsmc r s)
+
+instance Decidable m => Decidable (Strict.RWST r w s m) where
+  lose f = Strict.RWST $ \_ _ -> contramap (\(a, _, _) -> a) (lose f)
+  choose abc (Strict.RWST rsmb) (Strict.RWST rsmc) = Strict.RWST $ \r s ->
+    choose (\(a, s', w) -> either (Left  . betuple3 s' w)
+                                  (Right . betuple3 s' w)
+                                  (abc a))
+           (rsmb r s) (rsmc r s)
+
+instance Divisible m => Decidable (ListT m) where
+  lose _ = ListT conquer
+  choose f (ListT l) (ListT r) = ListT $ divide ((lefts &&& rights) . map f) l r
+
+instance Divisible m => Decidable (MaybeT m) where
+  lose _ = MaybeT conquer
+  choose f (MaybeT l) (MaybeT r) = MaybeT $
+    divide ( maybe (Nothing, Nothing)
+                   (either (\b -> (Just b, Nothing))
+                           (\c -> (Nothing, Just c)))
+           . fmap f) l r
+
+instance Decidable m => Decidable (Lazy.StateT s m) where
+  lose f = Lazy.StateT $ \_ -> contramap lazyFst (lose f)
+  choose f (Lazy.StateT l) (Lazy.StateT r) = Lazy.StateT $ \s ->
+    choose (\ ~(a, s') -> either (Left . betuple s') (Right . betuple s') (f a))
+           (l s) (r s)
+
+instance Decidable m => Decidable (Strict.StateT s m) where
+  lose f = Strict.StateT $ \_ -> contramap fst (lose f)
+  choose f (Strict.StateT l) (Strict.StateT r) = Strict.StateT $ \s ->
+    choose (\(a, s') -> either (Left . betuple s') (Right . betuple s') (f a))
+           (l s) (r s)
+
+instance Decidable m => Decidable (Lazy.WriterT w m) where
+  lose f = Lazy.WriterT $ contramap lazyFst (lose f)
+  choose f (Lazy.WriterT l) (Lazy.WriterT r) = Lazy.WriterT $
+    choose (\ ~(a, s') -> either (Left . betuple s') (Right . betuple s') (f a)) l r
+
+instance Decidable m => Decidable (Strict.WriterT w m) where
+  lose f = Strict.WriterT $ contramap fst (lose f)
+  choose f (Strict.WriterT l) (Strict.WriterT r) = Strict.WriterT $
+    choose (\(a, s') -> either (Left . betuple s') (Right . betuple s') (f a)) l r
+
+instance (Applicative f, Decidable g) => Decidable (Compose f g) where
+  lose = Compose . pure . lose
+  choose f (Compose l) (Compose r) = Compose (choose f <$> l <*> r)
+
+instance (Decidable f, Decidable g) => Decidable (Product f g) where
+  lose f = Pair (lose f) (lose f)
+  choose f (Pair l1 r1) (Pair l2 r2) = Pair (choose f l1 l2) (choose f r1 r2)
+
+instance Decidable f => Decidable (Reverse f) where
+  lose = Reverse . lose
+  choose f (Reverse l) (Reverse r) = Reverse $ choose f l r
+
+betuple :: s -> a -> (a, s)
+betuple s a = (a, s)
+
+betuple3 :: s -> w -> a -> (a, s, w)
+betuple3 s w a = (a, s, w)
+
+lazyFst :: (a, b) -> a
+lazyFst ~(a, _) = a
+
+#if MIN_VERSION_base(4,7,0) || defined(MIN_VERSION_tagged)
+instance Decidable Proxy where
+  lose _ = Proxy
+  choose _ Proxy Proxy = Proxy
+#endif
 
 #if MIN_VERSION_StateVar
 instance Decidable SettableVar where
