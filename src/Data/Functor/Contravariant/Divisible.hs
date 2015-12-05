@@ -1,5 +1,6 @@
 {-# LANGUAGE CPP #-}
 {-# LANGUAGE TypeOperators #-}
+{-# OPTIONS_GHC -fno-warn-deprecations #-}
 
 -----------------------------------------------------------------------------
 -- |
@@ -199,9 +200,9 @@ instance Divisible f => Divisible (Backwards f) where
   divide f (Backwards l) (Backwards r) = Backwards $ divide f l r
   conquer = Backwards conquer
 
--- instance Divisible m => Divisible (ErrorT e m) where
---   divide f (ErrorT l) (ErrorT r) = ErrorT $ divide (funzip . fmap f) l r
---   conquer = ErrorT conquer
+instance Divisible m => Divisible (ErrorT e m) where
+  divide f (ErrorT l) (ErrorT r) = ErrorT $ divide (funzip . fmap f) l r
+  conquer = ErrorT conquer
 
 instance Divisible m => Divisible (ExceptT e m) where
   divide f (ExceptT l) (ExceptT r) = ExceptT $ divide (funzip . fmap f) l r
