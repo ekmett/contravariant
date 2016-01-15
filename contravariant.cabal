@@ -55,7 +55,7 @@ library
   hs-source-dirs: src
   build-depends:
     base                              < 5,
-    transformers        >= 0.2 &&     < 0.5,
+    transformers        >= 0.2 &&     < 0.6,
     transformers-compat >= 0.3 &&     < 1,
     void                >= 0.6 &&     < 1
 
