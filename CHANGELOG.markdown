@@ -1,6 +1,8 @@
 1.4
 ---
 * Improved the performance of `Deciding` at the cost of downgrading it to `Trustworthy`.
+* Support for GHC 8
+* Support for `transformers` 0.5
 
 1.3.3
 -----
