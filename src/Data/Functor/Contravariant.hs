@@ -95,7 +95,7 @@ import Data.Monoid (Alt(..))
 import Data.Monoid (Monoid(..))
 #endif
 
-#ifdef MIN_VERSION_semigroups
+#if defined(MIN_VERSION_semigroups) || __GLASGOW_HASKELL__ >= 711
 import Data.Semigroup (Semigroup(..))
 #endif
 
@@ -299,7 +299,7 @@ newtype Comparison a = Comparison { getComparison :: a -> a -> Ordering }
 instance Contravariant Comparison where
   contramap f g = Comparison $ on (getComparison g) f
 
-#ifdef MIN_VERSION_semigroups
+#if defined(MIN_VERSION_semigroups) || __GLASGOW_HASKELL__ >= 711
 instance Semigroup (Comparison a) where
   Comparison p <> Comparison q = Comparison $ mappend p q
 #endif
@@ -344,7 +344,7 @@ newtype Equivalence a = Equivalence { getEquivalence :: a -> a -> Bool }
 instance Contravariant Equivalence where
   contramap f g = Equivalence $ on (getEquivalence g) f
 
-#ifdef MIN_VERSION_semigroups
+#if defined(MIN_VERSION_semigroups) || __GLASGOW_HASKELL__ >= 711
 instance Semigroup (Equivalence a) where
   Equivalence p <> Equivalence q = Equivalence $ \a b -> p a b && q a b
 #endif
@@ -375,7 +375,7 @@ instance Category Op where
 instance Contravariant (Op a) where
   contramap f g = Op (getOp g . f)
 
-#ifdef MIN_VERSION_semigroups
+#if defined(MIN_VERSION_semigroups) || __GLASGOW_HASKELL__ >= 711
 instance Semigroup a => Semigroup (Op a b) where
   Op p <> Op q = Op $ \a -> p a <> q a
 #endif
