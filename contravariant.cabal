@@ -56,13 +56,15 @@ library
   build-depends:
     base                              < 5,
     transformers        >= 0.2 &&     < 0.6,
-    transformers-compat >= 0.3 &&     < 1,
-    void                >= 0.6 &&     < 1
+    transformers-compat >= 0.3 &&     < 1
+
+  if !impl(ghc >= 7.9)
+    build-depends: void >= 0.6 &&     < 1
 
   if flag(tagged) && !impl(ghc >= 7.7)
     build-depends: tagged >= 0.4.4 && < 1
 
-  if flag(semigroups)
+  if flag(semigroups) && !impl(ghc >= 7.11)
     build-depends: semigroups >= 0.15.2 && < 1
 
   if flag(StateVar)
