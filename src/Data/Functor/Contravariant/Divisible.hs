@@ -56,7 +56,7 @@ import Data.Monoid (Monoid(..))
 import Data.Proxy
 #endif
 
-#if MIN_VERSION_StateVar
+#ifdef MIN_VERSION_StateVar
 import Data.StateVar
 #endif
 
@@ -280,7 +280,7 @@ instance Divisible Proxy where
   conquer = Proxy
 #endif
 
-#if MIN_VERSION_StateVar
+#ifdef MIN_VERSION_StateVar
 instance Divisible SettableStateVar where
   divide k (SettableStateVar l) (SettableStateVar r) = SettableStateVar $ \ a -> case k a of
     (b, c) -> l b >> r c
@@ -483,7 +483,7 @@ instance Decidable Proxy where
   choose _ Proxy Proxy = Proxy
 #endif
 
-#if MIN_VERSION_StateVar
+#ifdef MIN_VERSION_StateVar
 instance Decidable SettableVar where
   lose k = SettableStateVar (absurd . k)
   choose k (SettableStateVar l) (SettableStateVar r) = SettableStateVar $ \ a -> case k a of
