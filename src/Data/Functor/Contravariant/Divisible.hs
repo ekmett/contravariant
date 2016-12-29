@@ -484,7 +484,7 @@ instance Decidable Proxy where
 #endif
 
 #ifdef MIN_VERSION_StateVar
-instance Decidable SettableVar where
+instance Decidable SettableStateVar where
   lose k = SettableStateVar (absurd . k)
   choose k (SettableStateVar l) (SettableStateVar r) = SettableStateVar $ \ a -> case k a of
     Left b -> l b
