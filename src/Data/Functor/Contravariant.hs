@@ -137,7 +137,7 @@ class Contravariant f where
   (>$) = contramap . const
 
 -- | If 'f' is both 'Functor' and 'Contravariant' then by the time you factor in the laws
--- of each of those classes, it can't actually use it's argument in any meaningful capacity.
+-- of each of those classes, it can't actually use its argument in any meaningful capacity.
 --
 -- This method is surprisingly useful. Where both instances exist and are lawful we have
 -- the following laws:
