@@ -118,7 +118,32 @@ import GHC.Generics
 
 import Prelude hiding ((.),id)
 
--- | Any instance should be subject to the following laws:
+-- | The class of contravariant functors.
+--
+-- Whereas in Haskell, one can think of a 'Functor' as containing or producing
+-- values, a contravariant functor is a functor that can be thought of as
+-- /consuming/ values.
+--
+-- As an example, consider the type of predicate functions  @a -> Bool@. One
+-- such predicate might be @negative x = x < 0@, which
+-- classisifies integers as to whether they are negative. However, given this
+-- predicate, we can re-use it in other situations, providing we have a way to
+-- map values /to/ integers. For instance, we can use the @negative@ predicate
+-- on a persons bank balance to work out if they are currently overdrawn:
+--
+-- @
+-- newtype Predicate a = Predicate (a -> Bool)
+--
+-- instance Contravariant Predicate where
+--   contramap f (Predicate p) = Predicate (p . f)
+--                                          |   `- First, map the input...
+--                                          `----- then apply the predicate.
+--
+-- overdrawn :: Predicate Person
+-- overdrawn = contramap personBankBalance negative
+-- @
+--
+-- Any instance should be subject to the following laws:
 --
 -- > contramap id = id
 -- > contramap f . contramap g = contramap (g . f)
