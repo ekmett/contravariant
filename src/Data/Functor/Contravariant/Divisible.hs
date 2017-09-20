@@ -20,6 +20,11 @@ module Data.Functor.Contravariant.Divisible
     Divisible(..), divided, conquered, liftD
   -- * Contravariant Alternative
   , Decidable(..), chosen, lost
+  -- * Mathematical definitions
+  -- $math
+
+  -- ** A note on 'conquer'
+  -- $conquer
   ) where
 
 import Control.Applicative
@@ -73,48 +78,54 @@ import GHC.Generics
 --
 -- A 'Divisible' contravariant functor is the contravariant analogue of 'Applicative'.
 --
--- In denser jargon, a 'Divisible' contravariant functor is a monoid object in the category
--- of presheaves from Hask to Hask, equipped with Day convolution mapping the Cartesian
--- product of the source to the Cartesian product of the target.
+-- Continuing the intuition that 'Contravariant' functors consume input, a 'Divisible'
+-- contravariant functor also has the ability to composed "beside" another contravariant
+-- functor.
 --
--- By way of contrast, an 'Applicative' functor can be viewed as a monoid object in the
--- category of copresheaves from Hask to Hask, equipped with Day convolution mapping the
--- Cartesian product of the source to the Cartesian product of the target.
---
--- Given the canonical diagonal morphism:
+-- Serializers provide a good example of 'Divisible' contravariant functors. To begin
+-- let's start with the type of serializers for specific types:
 --
 -- @
--- delta a = (a,a)
+-- newtype Serializer a = Serializer { runSerializer :: a -> ByteString }
 -- @
 --
--- @'divide' 'delta'@ should be associative with 'conquer' as a unit
+-- This is a contravariant functor:
 --
 -- @
--- 'divide' 'delta' m 'conquer' = m
--- 'divide' 'delta' 'conquer' m = m
--- 'divide' 'delta' ('divide' 'delta' m n) o = 'divide' 'delta' m ('divide' 'delta' n o)
+-- instance Contravariant Serializer where
+--   contramap f s = Serializer . runSerializer s . f
 -- @
 --
--- With more general arguments you'll need to reassociate and project using the monoidal
--- structure of the source category. (Here fst and snd are used in lieu of the more restricted
--- lambda and rho, but this construction works with just a monoidal category.)
+-- That is, given a serializer for @a@ (@s :: Serializer a@), and a way to turn
+-- @b@s into @a@s (a mapping @f :: b -> a@), we have a serializer for @b@:
+-- @contramap f s :: Serializer b@.
+--
+-- Divisible gives us a way to combine two serializers that focus on different
+-- parts of a structure. If we postulate the existance of two primitive
+-- serializers - @string :: Serializer String@ and @int :: Serializer Int@, we
+-- would like to be able to combine these into a serializer for pairs of
+-- @String@s and @Int@s. How can we do this? Simply run both serializer and
+-- combine their output!
 --
 -- @
--- 'divide' f m 'conquer' = 'contramap' ('fst' . f) m
--- 'divide' f 'conquer' m = 'contramap' ('snd' . f) m
--- 'divide' f ('divide' g m n) o = 'divide' f' m ('divide' 'id' n o) where
---   f' a = case f a of (bc,d) -> case g bc of (b,c) -> (a,(b,c))
+-- combine :: Serializer a -> Serializer b -> Serializer (a, b)
+-- combine serializeA serializeB = Serializer $ \(a, b) ->
+--   let aBytes = runSerializer serializeA a
+--       bBytes = runSerializer serializeB b
+--   in aBytes <> bBytes
+--
+-- serializeStringAndInt :: Serializer (String, Int)
+-- serializeStringAndInt = combine string int
 -- @
+--
+-- 'divide' is a generalization by also taking a 'contramap' like function to
+-- split any @a@ into a pair. This conveniently allows you to target fields of
+-- a record, for instance, by extracting the values under two fields and
+-- combining them into a tuple.
 class Contravariant f => Divisible f where
   divide  :: (a -> (b, c)) -> f b -> f c -> f a
-  -- | The underlying theory would suggest that this should be:
-  --
-  -- @
-  -- conquer :: (a -> ()) -> f a
-  -- @
-  --
-  -- However, as we are working over a Cartesian category (Hask) and the Cartesian product, such an input
-  -- morphism is uniquely determined to be @'const' 'mempty'@, so we elide it.
+
+  -- | Conquer acts as an identity for combining @Divisible@ functors.
   conquer :: f a
 
 -- |
@@ -490,3 +501,48 @@ instance Decidable SettableStateVar where
     Left b -> l b
     Right c -> r c
 #endif
+
+-- $math
+--
+-- In denser jargon, a 'Divisible' contravariant functor is a monoid object in the category
+-- of presheaves from Hask to Hask, equipped with Day convolution mapping the Cartesian
+-- product of the source to the Cartesian product of the target.
+--
+-- By way of contrast, an 'Applicative' functor can be viewed as a monoid object in the
+-- category of copresheaves from Hask to Hask, equipped with Day convolution mapping the
+-- Cartesian product of the source to the Cartesian product of the target.
+--
+-- Given the canonical diagonal morphism:
+--
+-- @
+-- delta a = (a,a)
+-- @
+--
+-- @'divide' 'delta'@ should be associative with 'conquer' as a unit
+--
+-- @
+-- 'divide' 'delta' m 'conquer' = m
+-- 'divide' 'delta' 'conquer' m = m
+-- 'divide' 'delta' ('divide' 'delta' m n) o = 'divide' 'delta' m ('divide' 'delta' n o)
+-- @
+--
+-- With more general arguments you'll need to reassociate and project using the monoidal
+-- structure of the source category. (Here fst and snd are used in lieu of the more restricted
+-- lambda and rho, but this construction works with just a monoidal category.)
+--
+-- @
+-- 'divide' f m 'conquer' = 'contramap' ('fst' . f) m
+-- 'divide' f 'conquer' m = 'contramap' ('snd' . f) m
+-- 'divide' f ('divide' g m n) o = 'divide' f' m ('divide' 'id' n o) where
+--   f' a = case f a of (bc,d) -> case g bc of (b,c) -> (a,(b,c))
+-- @
+
+-- $conquer
+-- The underlying theory would suggest that this should be:
+--
+-- @
+-- conquer :: (a -> ()) -> f a
+-- @
+--
+-- However, as we are working over a Cartesian category (Hask) and the Cartesian product, such an input
+-- morphism is uniquely determined to be @'const' 'mempty'@, so we elide it.
