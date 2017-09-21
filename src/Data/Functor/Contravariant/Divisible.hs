@@ -79,7 +79,7 @@ import GHC.Generics
 -- A 'Divisible' contravariant functor is the contravariant analogue of 'Applicative'.
 --
 -- Continuing the intuition that 'Contravariant' functors consume input, a 'Divisible'
--- contravariant functor also has the ability to composed "beside" another contravariant
+-- contravariant functor also has the ability to be composed "beside" another contravariant
 -- functor.
 --
 -- Serializers provide a good example of 'Divisible' contravariant functors. To begin
