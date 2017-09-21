@@ -21,10 +21,14 @@ module Data.Functor.Contravariant.Divisible
   -- * Contravariant Alternative
   , Decidable(..), chosen, lost
   -- * Mathematical definitions
-  -- $math
+  -- ** Divisible
+  -- $divisible
 
-  -- ** A note on 'conquer'
+  -- *** A note on 'conquer'
   -- $conquer
+
+  -- ** Decidable
+  -- $decidable
   ) where
 
 import Control.Applicative
@@ -313,26 +317,58 @@ funzip = fmap fst &&& fmap snd
 -- * Contravariant Alternative
 --------------------------------------------------------------------------------
 
--- |
+-- | A 'Decidable' contravariant functor is the contravariant analogue of 'Alternative'.
 --
--- A 'Divisible' contravariant functor is a monoid object in the category of presheaves
--- from Hask to Hask, equipped with Day convolution mapping the cartesian product of the
--- source to the Cartesian product of the target.
+-- Noting the superclass constraint that @f@ must also be 'Divisible', a @Decidable@
+-- functor has the ability to "fan out" input, under the intuition that contravariant
+-- functors consume input.
+--
+-- In the dicussion for @Divisible@, an example was demonstrated with @Serializer@s,
+-- that turn @a@s into @ByteString@s. @Divisible@ allowed us to serialize the /product/
+-- of multiple values by concatenation. By making our @Serializer@ also @Decidable@-
+-- we now have the ability to serialize the /sum/ of multiple values - for example
+-- different constructors in an ADT.
+--
+-- Consider serializing arbitrary identifiers that can be either @String@s or @Int@s:
 --
 -- @
--- 'choose' 'Left' m ('lose' f)  = m
--- 'choose' 'Right' ('lose' f) m = m
--- 'choose' f ('choose' g m n) o = 'divide' f' m ('divide' 'id' n o) where
---   f' bcd = 'either' ('either' 'id' ('Right' . 'Left') . g) ('Right' . 'Right') . f
+-- data Identifier = StringId String | IntId Int
 -- @
 --
--- In addition, we expect the same kind of distributive law as is satisfied by the usual
--- covariant 'Alternative', w.r.t 'Applicative', which should be fully formulated and
--- added here at some point!
-
+-- We know we have serializers for @String@s and @Int@s, but how do we combine them
+-- into a @Serializer@ for @Identifier@? Essentially, our @Serializer@ needs to
+-- scrutinise the incoming value and choose how to serialize it:
+--
+-- @
+-- identifier :: Serializer Identifier
+-- identifier = Serializer $ \identifier ->
+--   case identifier of
+--     StringId s -> runSerializer string s
+--     IntId i -> runSerializer int i
+-- @
+--
+-- It is exactly this notion of choice that @Decidable@ encodes. Hence if we add
+-- an instance of @Decidable@ for @Serializer@...
+--
+-- @
+-- instance Decidable Serializer where
+--   lose f = Serializer $ \a -> absurd (f a)
+--   choose split l r = Serializer $ \a ->
+--     either (runSerializer l) (runSerializer r) (split a)
+-- @
+--
+-- Then our @identifier@ @Serializer@ is
+--
+-- @
+-- identifier :: Serializer Identifier
+-- identifier = choose toEither string int where
+--   toEither (StringId s) = Left s
+--   toEither (IntId i) = Right i
+-- @
 class Divisible f => Decidable f where
-  -- | The only way to win is not to play.
+  -- | Acts as identity to 'choose'.
   lose :: (a -> Void) -> f a
+
   choose :: (a -> Either b c) -> f b -> f c -> f a
 
 -- |
@@ -502,7 +538,7 @@ instance Decidable SettableStateVar where
     Right c -> r c
 #endif
 
--- $math
+-- $divisible
 --
 -- In denser jargon, a 'Divisible' contravariant functor is a monoid object in the category
 -- of presheaves from Hask to Hask, equipped with Day convolution mapping the Cartesian
@@ -546,3 +582,20 @@ instance Decidable SettableStateVar where
 --
 -- However, as we are working over a Cartesian category (Hask) and the Cartesian product, such an input
 -- morphism is uniquely determined to be @'const' 'mempty'@, so we elide it.
+
+-- $decidable
+--
+-- A 'Divisible' contravariant functor is a monoid object in the category of presheaves
+-- from Hask to Hask, equipped with Day convolution mapping the cartesian product of the
+-- source to the Cartesian product of the target.
+--
+-- @
+-- 'choose' 'Left' m ('lose' f)  = m
+-- 'choose' 'Right' ('lose' f) m = m
+-- 'choose' f ('choose' g m n) o = 'divide' f' m ('divide' 'id' n o) where
+--   f' bcd = 'either' ('either' 'id' ('Right' . 'Left') . g) ('Right' . 'Right') . f
+-- @
+--
+-- In addition, we expect the same kind of distributive law as is satisfied by the usual
+-- covariant 'Alternative', w.r.t 'Applicative', which should be fully formulated and
+-- added here at some point!
