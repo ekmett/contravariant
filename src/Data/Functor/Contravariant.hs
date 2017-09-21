@@ -118,7 +118,7 @@ import GHC.Generics
 
 import Prelude hiding ((.),id)
 
--- | The of contravariant functors.
+-- | The class of contravariant functors.
 --
 -- Whereas in Haskell, one can think of a 'Functor' as containing or producing
 -- values, a contravariant functor is a functor that can be thought of as
