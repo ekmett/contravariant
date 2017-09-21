@@ -140,7 +140,7 @@ import GHC.Generics
 --             iBytes = runSerializer serializeB b
 --         in sBytes <> iBytes
 --
--- stringAndInt :: Serializer (String, Int)
+-- stringAndInt :: Serializer StringAndInt
 -- stringAndInt =
 --   divide (\(StringAndInt s i) -> (s, i)) string int
 -- @
