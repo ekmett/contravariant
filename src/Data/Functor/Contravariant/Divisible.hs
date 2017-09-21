@@ -112,20 +112,39 @@ import GHC.Generics
 -- combine their output!
 --
 -- @
--- combine :: Serializer a -> Serializer b -> Serializer (a, b)
--- combine serializeA serializeB = Serializer $ \(a, b) ->
---   let aBytes = runSerializer serializeA a
---       bBytes = runSerializer serializeB b
---   in aBytes <> bBytes
+-- data StringAndInt = StringAndInt String Int
 --
--- serializeStringAndInt :: Serializer (String, Int)
--- serializeStringAndInt = combine string int
+-- stringAndInt :: Serializer StringAndInt
+-- stringAndInt = Serializer $ \(StringAndInt s i) ->
+--   let sBytes = runSerializer string s
+--       iBytes = runSerializer int i
+--   in sBytes <> iBytes
 -- @
 --
 -- 'divide' is a generalization by also taking a 'contramap' like function to
 -- split any @a@ into a pair. This conveniently allows you to target fields of
 -- a record, for instance, by extracting the values under two fields and
 -- combining them into a tuple.
+--
+-- To complete the example, here is how to write @stringAndInt@ using a
+-- @Divisible@ instance:
+--
+-- @
+-- instance Divisible Serializer where
+--   conquer = Serializer (const mempty)
+--
+--   divide toBC b c = Serializer $ \a ->
+--     case toBC a of
+--       (a, b) ->
+--         let sBytes = runSerializer serializeA a
+--             iBytes = runSerializer serializeB b
+--         in sBytes <> iBytes
+--
+-- stringAndInt :: Serializer (String, Int)
+-- stringAndInt =
+--   divide (\(StringAndInt s i) -> (s, i)) string int
+-- @
+--
 class Contravariant f => Divisible f where
   divide  :: (a -> (b, c)) -> f b -> f c -> f a
 
