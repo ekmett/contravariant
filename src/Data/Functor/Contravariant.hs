@@ -285,6 +285,10 @@ newtype Predicate a = Predicate { getPredicate :: a -> Bool }
 instance Contravariant Predicate where
   contramap f g = Predicate $ getPredicate g . f
 
+instance Monoid (Predicate a) where
+  mempty = Predicate $ const True
+  mappend (Predicate p) (Predicate q) = Predicate $ \a -> p a && q a
+
 -- | Defines a total ordering on a type as per 'compare'
 --
 -- This condition is not checked by the types. You must ensure that the supplied
