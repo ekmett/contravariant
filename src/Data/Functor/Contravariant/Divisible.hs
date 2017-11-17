@@ -97,7 +97,7 @@ import GHC.Generics
 --
 -- @
 -- instance Contravariant Serializer where
---   contramap f s = Serializer . runSerializer s . f
+--   contramap f s = Serializer (runSerializer s . f)
 -- @
 --
 -- That is, given a serializer for @a@ (@s :: Serializer a@), and a way to turn
@@ -133,12 +133,12 @@ import GHC.Generics
 -- instance Divisible Serializer where
 --   conquer = Serializer (const mempty)
 --
---   divide toBC b c = Serializer $ \a ->
+--   divide toBC bSerializer cSerializer = Serializer $ \a ->
 --     case toBC a of
---       (a, b) ->
---         let sBytes = runSerializer serializeA a
---             iBytes = runSerializer serializeB b
---         in sBytes <> iBytes
+--       (b, c) ->
+--         let bBytes = runSerializer bSerializer b
+--             cBytes = runSerializer cSerializer c
+--         in bBytes <> cBytes
 --
 -- stringAndInt :: Serializer StringAndInt
 -- stringAndInt =
