@@ -310,9 +310,18 @@ newtype Predicate a = Predicate { getPredicate :: a -> Bool }
 instance Contravariant Predicate where
   contramap f g = Predicate $ getPredicate g . f
 
+#if defined(MIN_VERSION_semigroups) || __GLASGOW_HASKELL__ >= 711
+instance Semigroup (Predicate a) where
+  Predicate p <> Predicate q = Predicate $ \a -> p a && q a
+#endif
+
 instance Monoid (Predicate a) where
   mempty = Predicate $ const True
+#if defined(MIN_VERSION_semigroups) || __GLASGOW_HASKELL__ >= 711
+  mappend = (<>)
+#else
   mappend (Predicate p) (Predicate q) = Predicate $ \a -> p a && q a
+#endif
 
 -- | Defines a total ordering on a type as per 'compare'
 --
