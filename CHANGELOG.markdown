@@ -1,3 +1,10 @@
+next [????.??.??]
+-----------------
+* Add `Semigroup` and `Monoid` instances for `Predicate`.
+* Add lots of documentation explaining `Contravariant`, `Divisible`, and
+  `Decidable`.
+* Fix some dodgy CPP usage that caused the build to fail on Eta.
+
 1.4
 ---
 * Improved the performance of `Deciding` at the cost of downgrading it to `Trustworthy`.
