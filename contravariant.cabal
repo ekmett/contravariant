@@ -11,7 +11,7 @@ homepage:      http://github.com/ekmett/contravariant/
 bug-reports:   http://github.com/ekmett/contravariant/issues
 copyright:     Copyright (C) 2007-2015 Edward A. Kmett
 synopsis:      Contravariant functors
-description:   Contravariant functors
+description:   Contravariant functors.
 build-type:    Simple
 tested-with:   GHC == 7.0.4
              , GHC == 7.2.2
