@@ -50,6 +50,10 @@ next [????.??.??]
 -----
 * Fix build on GHC 7.0.4
 
+1.2
+-----
+* Renamed `Data.Functor.Contravariant.Applicative` to `Data.Functor.Contravariant.Divisible`
+
 1.1.1
 -----
 * Added `Data.Functor.Contravariant.Applicative`
