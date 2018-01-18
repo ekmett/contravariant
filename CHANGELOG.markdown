@@ -1,5 +1,5 @@
-next [????.??.??]
------------------
+1.4.1 [2018.01.18]
+------------------
 * Add `Semigroup` and `Monoid` instances for `Predicate`.
 * Add lots of documentation explaining `Contravariant`, `Divisible`, and
   `Decidable`.
