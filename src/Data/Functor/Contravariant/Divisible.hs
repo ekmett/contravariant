@@ -611,8 +611,8 @@ instance Decidable SettableStateVar where
 -- @
 -- 'choose' 'Left' m ('lose' f)  = m
 -- 'choose' 'Right' ('lose' f) m = m
--- 'choose' f ('choose' g m n) o = 'divide' f' m ('divide' 'id' n o) where
---   f' bcd = 'either' ('either' 'id' ('Right' . 'Left') . g) ('Right' . 'Right') . f
+-- 'choose' f ('choose' g m n) o = 'choose' f' m ('choose' 'id' n o) where
+--   f' = 'either' ('either' 'id' 'Left' . g) ('Right' . 'Right') . f
 -- @
 --
 -- In addition, we expect the same kind of distributive law as is satisfied by the usual
