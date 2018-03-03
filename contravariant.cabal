@@ -87,9 +87,12 @@ library
     cpp-options: -DSAFE
 
   exposed-modules:
-    Data.Functor.Contravariant
     Data.Functor.Contravariant.Compose
     Data.Functor.Contravariant.Divisible
+
+  if impl(ghc < 8.5)
+    hs-source-dirs: old-src
+    exposed-modules: Data.Functor.Contravariant
 
   if impl(ghc >= 7.4)
     exposed-modules: Data.Functor.Contravariant.Generic

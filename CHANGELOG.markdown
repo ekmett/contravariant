@@ -1,3 +1,8 @@
+next [????.??.??]
+-----------------
+* Support building with GHC 8.6, where `Data.Functor.Contravariant` has been
+  moved into `base`.
+
 1.4.1 [2018.01.18]
 ------------------
 * Add `Semigroup` and `Monoid` instances for `Predicate`.
