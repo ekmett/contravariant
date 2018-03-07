@@ -115,7 +115,7 @@ import GHC.Generics
 -- data StringAndInt = StringAndInt String Int
 --
 -- stringAndInt :: Serializer StringAndInt
--- stringAndInt = Serializer $ \(StringAndInt s i) ->
+-- stringAndInt = Serializer $ \\(StringAndInt s i) ->
 --   let sBytes = runSerializer string s
 --       iBytes = runSerializer int i
 --   in sBytes <> iBytes
@@ -133,7 +133,7 @@ import GHC.Generics
 -- instance Divisible Serializer where
 --   conquer = Serializer (const mempty)
 --
---   divide toBC bSerializer cSerializer = Serializer $ \a ->
+--   divide toBC bSerializer cSerializer = Serializer $ \\a ->
 --     case toBC a of
 --       (b, c) ->
 --         let bBytes = runSerializer bSerializer b
@@ -142,7 +142,7 @@ import GHC.Generics
 --
 -- stringAndInt :: Serializer StringAndInt
 -- stringAndInt =
---   divide (\(StringAndInt s i) -> (s, i)) string int
+--   divide (\\(StringAndInt s i) -> (s, i)) string int
 -- @
 --
 class Contravariant f => Divisible f where
@@ -360,7 +360,7 @@ funzip = fmap fst &&& fmap snd
 --
 -- @
 -- identifier :: Serializer Identifier
--- identifier = Serializer $ \identifier ->
+-- identifier = Serializer $ \\identifier ->
 --   case identifier of
 --     StringId s -> runSerializer string s
 --     IntId i -> runSerializer int i
@@ -371,8 +371,8 @@ funzip = fmap fst &&& fmap snd
 --
 -- @
 -- instance Decidable Serializer where
---   lose f = Serializer $ \a -> absurd (f a)
---   choose split l r = Serializer $ \a ->
+--   lose f = Serializer $ \\a -> absurd (f a)
+--   choose split l r = Serializer $ \\a ->
 --     either (runSerializer l) (runSerializer r) (split a)
 -- @
 --
