@@ -78,7 +78,7 @@ library
     build-depends: semigroups >= 0.15.2 && < 1
 
   if flag(StateVar)
-    build-depends: StateVar >= 1.1 && < 1.2
+    build-depends: StateVar >= 1.1.1 && < 1.2
 
   if impl(ghc >= 7.2 && < 7.6)
     build-depends: ghc-prim
