@@ -181,7 +181,7 @@ infixl 4 >$, $<, >$<, >$$<
 ($<) = flip (>$)
 {-# INLINE ($<) #-}
 
--- | This is an infix alias for 'contramap'
+-- | This is an infix alias for 'contramap'.
 (>$<) :: Contravariant f => (a -> b) -> f b -> f a
 (>$<) = contramap
 {-# INLINE (>$<) #-}
@@ -201,7 +201,7 @@ instance Contravariant V1 where
   contramap _ x = x `seq` undefined
 
 instance Contravariant U1 where
-  contramap _ U1 = U1
+  contramap _ _ = U1
 
 instance Contravariant f => Contravariant (Rec1 f) where
   contramap f (Rec1 fp)= Rec1 (contramap f fp)
@@ -297,7 +297,7 @@ instance Contravariant SettableStateVar where
 
 #if (__GLASGOW_HASKELL__ >= 707) || defined(VERSION_tagged)
 instance Contravariant Proxy where
-  contramap _ Proxy = Proxy
+  contramap _ _ = Proxy
 #endif
 
 newtype Predicate a = Predicate { getPredicate :: a -> Bool }
@@ -323,7 +323,7 @@ instance Monoid (Predicate a) where
   mappend (Predicate p) (Predicate q) = Predicate $ \a -> p a && q a
 #endif
 
--- | Defines a total ordering on a type as per 'compare'
+-- | Defines a total ordering on a type as per 'compare'.
 --
 -- This condition is not checked by the types. You must ensure that the supplied
 -- values are valid total orderings yourself.
@@ -346,7 +346,7 @@ instance Monoid (Comparison a) where
   mempty = Comparison (\_ _ -> EQ)
   mappend (Comparison p) (Comparison q) = Comparison $ mappend p q
 
--- | Compare using 'compare'
+-- | Compare using 'compare'.
 defaultComparison :: Ord a => Comparison a
 defaultComparison = Comparison compare
 
@@ -391,7 +391,7 @@ instance Monoid (Equivalence a) where
   mempty = Equivalence (\_ _ -> True)
   mappend (Equivalence p) (Equivalence q) = Equivalence $ \a b -> p a b && q a b
 
--- | Check for equivalence with '=='
+-- | Check for equivalence with '=='.
 --
 -- Note: The instances for 'Double' and 'Float' violate reflexivity for @NaN@.
 defaultEquivalence :: Eq a => Equivalence a
