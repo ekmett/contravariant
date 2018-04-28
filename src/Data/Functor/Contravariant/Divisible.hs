@@ -589,7 +589,7 @@ instance Decidable SettableStateVar where
 -- 'divide' f m 'conquer' = 'contramap' ('fst' . f) m
 -- 'divide' f 'conquer' m = 'contramap' ('snd' . f) m
 -- 'divide' f ('divide' g m n) o = 'divide' f' m ('divide' 'id' n o) where
---   f' a = case f a of (bc,d) -> case g bc of (b,c) -> (a,(b,c))
+--   f' a = let (bc, d) = f a; (b, c) = g bc in (b, (c, d))
 -- @
 
 -- $conquer
