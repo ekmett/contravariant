@@ -1,5 +1,5 @@
-next [????.??.??]
------------------
+1.5 [2018.07.01]
+----------------
 * Support building with GHC 8.6, where `Data.Functor.Contravariant` has been
   moved into `base`.
 
