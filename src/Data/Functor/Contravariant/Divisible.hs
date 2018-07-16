@@ -146,6 +146,7 @@ import GHC.Generics
 -- @
 --
 class Contravariant f => Divisible f where
+  --- | If one can handle split `a` into `(b, c)`, as well as handle `b`s and `c`s, then one can handle `a`s
   divide  :: (a -> (b, c)) -> f b -> f c -> f a
 
   -- | Conquer acts as an identity for combining @Divisible@ functors.
