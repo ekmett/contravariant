@@ -108,7 +108,7 @@ import GHC.Generics
 -- parts of a structure. If we postulate the existance of two primitive
 -- serializers - @string :: Serializer String@ and @int :: Serializer Int@, we
 -- would like to be able to combine these into a serializer for pairs of
--- @String@s and @Int@s. How can we do this? Simply run both serializer and
+-- @String@s and @Int@s. How can we do this? Simply run both serializers and
 -- combine their output!
 --
 -- @
@@ -343,7 +343,7 @@ funzip = fmap fst &&& fmap snd
 -- functor has the ability to "fan out" input, under the intuition that contravariant
 -- functors consume input.
 --
--- In the dicussion for @Divisible@, an example was demonstrated with @Serializer@s,
+-- In the discussion for @Divisible@, an example was demonstrated with @Serializer@s,
 -- that turn @a@s into @ByteString@s. @Divisible@ allowed us to serialize the /product/
 -- of multiple values by concatenation. By making our @Serializer@ also @Decidable@-
 -- we now have the ability to serialize the /sum/ of multiple values - for example
