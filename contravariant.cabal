@@ -50,11 +50,6 @@ flag semigroups
   default: True
   manual: True
 
-flag safe
-  description: Get Safe guarantees rather than merely Trustworthy, but with worse constant factors.
-  default: False
-  manual: True
-
 flag StateVar
   description:
     You can disable the use of the `StateVar` package using `-f-StateVar`.
@@ -86,9 +81,6 @@ library
 
   if impl(ghc >= 7.2 && < 7.6)
     build-depends: ghc-prim
-
-  if flag(safe)
-    cpp-options: -DSAFE
 
   exposed-modules:
     Data.Functor.Contravariant.Compose

@@ -1,3 +1,8 @@
+next [????.??.??]
+-----------------
+* Remove the use of `unsafeCoerce` in `Data.Functor.Contravariant.Generic`. As
+  a result, the `safe` flag has been removed, as it is no longer used.
+
 1.5 [2018.07.01]
 ----------------
 * Support building with GHC 8.6, where `Data.Functor.Contravariant` has been
