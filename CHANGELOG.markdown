@@ -1,5 +1,5 @@
-next [????.??.??]
------------------
+1.5.1 [2019.05.02]
+------------------
 * Remove the use of `unsafeCoerce` in `Data.Functor.Contravariant.Generic`. As
   a result, the `safe` flag has been removed, as it is no longer used.
 
