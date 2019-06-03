@@ -1,5 +1,5 @@
-next [????.??.??]
------------------
+1.5.2 [2019.06.03]
+------------------
 * Mark `Data.Functor.Contravariant` and `Data.Functor.Contravariant.Generic`
   as unconditionally `Trustworthy`.
 
