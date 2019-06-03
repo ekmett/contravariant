@@ -93,4 +93,7 @@ library
   if impl(ghc >= 7.4)
     exposed-modules: Data.Functor.Contravariant.Generic
 
+  if impl(ghc >= 7.10)
+    ghc-options: -fno-warn-trustworthy-safe
+
   ghc-options: -Wall

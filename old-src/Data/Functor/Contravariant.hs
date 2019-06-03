@@ -14,12 +14,8 @@
 #define MIN_VERSION_base(x,y,z) 1
 #endif
 
-#if __GLASGOW_HASKELL__ >= 704
-#if MIN_VERSION_transformers(0,3,0) && MIN_VERSION_tagged(0,6,1)
-{-# LANGUAGE Safe #-}
-#else
+#if __GLASGOW_HASKELL__ >= 702
 {-# LANGUAGE Trustworthy #-}
-#endif
 #endif
 
 {-# OPTIONS_GHC -fno-warn-deprecations #-}

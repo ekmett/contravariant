@@ -1,3 +1,8 @@
+next [????.??.??]
+-----------------
+* Mark `Data.Functor.Contravariant` and `Data.Functor.Contravariant.Generic`
+  as unconditionally `Trustworthy`.
+
 1.5.1 [2019.05.02]
 ------------------
 * Remove the use of `unsafeCoerce` in `Data.Functor.Contravariant.Generic`. As
