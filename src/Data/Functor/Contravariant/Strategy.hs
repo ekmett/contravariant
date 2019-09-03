@@ -1,6 +1,11 @@
+{-# LANGUAGE CPP #-}
 
 import Data.Functor.Contravariant
 import Data.Functor.Contravariant.Divisible
+
+#ifdef HLINT
+{-# ANN module "HLint: ignore" #-}
+#endif
 
 data Strategy a where
   Strategy :: (a -> b) -> Strategy a

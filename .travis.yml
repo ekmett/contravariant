@@ -168,7 +168,7 @@ script:
   # build & run tests, build benchmarks
   - ${CABAL} v2-build $WITHCOMPILER ${TEST} ${BENCH} all | color_cabal_output
   # HLint..
-  - if [ $HCNUMVER -ge 80800 ] && [ $HCNUMVER -lt 80802 ] ; then (cd ${PKGDIR_contravariant} && hlint --cpp-ansi --cpp-define=HLINT src old-src) ; fi
+  - if [ $HCNUMVER -ge 80800 ] && [ $HCNUMVER -lt 80802 ] ; then (cd ${PKGDIR_contravariant} && hlint src old-src) ; fi
   # cabal check...
   - (cd ${PKGDIR_contravariant} && ${CABAL} -vnormal check)
   # haddock...

@@ -498,8 +498,8 @@ instance Divisible m => Decidable (MaybeT m) where
   choose f (MaybeT l) (MaybeT r) = MaybeT $
     divide ( maybe (Nothing, Nothing)
                    (either (\b -> (Just b, Nothing))
-                           (\c -> (Nothing, Just c)))
-           . fmap f) l r
+                           (\c -> (Nothing, Just c)) . f)
+           ) l r
 
 instance Decidable m => Decidable (Lazy.StateT s m) where
   lose f = Lazy.StateT $ \_ -> contramap lazyFst (lose f)
