@@ -19,7 +19,7 @@ module Data.Functor.Contravariant.Divisible
   -- * Contravariant Applicative
     Divisible(..), divided, conquered, liftD
   -- * Contravariant Alternative
-  , Decidable(..), chosen, lost
+  , Decidable(..), chosen, lost, (>*<)
   -- * Mathematical definitions
   -- ** Divisible
   -- $divisible
@@ -404,6 +404,28 @@ lost = lose id
 -- @
 chosen :: Decidable f => f b -> f c -> f (Either b c)
 chosen = choose id
+
+-- | Infix 'divided'
+--
+-- You can use this and @(`>$<`)@ in a manner analogous to `Applicative`
+-- style:
+--
+-- @
+-- data Point = Point { x :: 'Double', y :: 'Double', z :: Double }
+--
+-- nonNegative :: 'Predicate' 'Double'
+-- nonNegative = 'Predicate' (0 <=)
+--
+-- nonNegativeOctant :: 'Predicate' Point
+-- nonNegativeOctant =
+--     adapt '>$<' nonNegative '>*<' nonNegative '>*<' nonNegative
+--   where
+--     adapt Point{..} = (x, (y, z))
+-- @
+(>*<) :: Divisible f => f a -> f b -> f (a, b)
+(>*<) = divided
+
+infixr 5 >*<
 
 instance Decidable Comparison where
   lose f = Comparison $ \a _ -> absurd (f a)
