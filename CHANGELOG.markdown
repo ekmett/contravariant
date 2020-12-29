@@ -1,3 +1,7 @@
+1.5.3 [202y.mm.dd]
+------------------
+* Explicitly mark modules as `Safe`.
+
 1.5.2 [2019.06.03]
 ------------------
 * Mark `Data.Functor.Contravariant` and `Data.Functor.Contravariant.Generic`

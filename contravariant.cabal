@@ -1,6 +1,6 @@
 name:          contravariant
 category:      Control, Data
-version:       1.5.2
+version:       1.5.3
 license:       BSD3
 cabal-version: >= 1.10
 license-file:  LICENSE
@@ -63,22 +63,22 @@ library
   hs-source-dirs: src
   build-depends:
     base                              < 5,
-    transformers        >= 0.2 &&     < 0.6
+    transformers        >= 0.3 &&     < 0.6
 
   if !impl(ghc > 7.10)
-    build-depends: transformers-compat >= 0.3 && < 1
+    build-depends: transformers-compat >= 0.5 && < 1
 
   if !impl(ghc >= 7.9)
-    build-depends: void >= 0.6 &&     < 1
+    build-depends: void >= 0.6.1 && < 1
 
   if flag(tagged) && !impl(ghc >= 7.7)
-    build-depends: tagged >= 0.4.4 && < 1
+    build-depends: tagged >= 0.8.6.1 && < 1
 
   if flag(semigroups) && !impl(ghc >= 7.11)
-    build-depends: semigroups >= 0.15.2 && < 1
+    build-depends: semigroups >= 0.18.5 && < 1
 
   if flag(StateVar)
-    build-depends: StateVar >= 1.1.1 && < 1.3
+    build-depends: StateVar >= 1.2.1 && < 1.3
 
   if impl(ghc >= 7.2 && < 7.6)
     build-depends: ghc-prim
@@ -94,11 +94,13 @@ library
   if impl(ghc >= 7.4)
     exposed-modules: Data.Functor.Contravariant.Generic
 
-  if impl(ghc >= 7.10)
-    ghc-options: -fno-warn-trustworthy-safe
-
   if impl(ghc >= 8.6)
     ghc-options: -Wno-star-is-type
+
+  if impl(ghc >= 9.0)
+    -- these flags may abort compilation with GHC-8.10
+    -- https://gitlab.haskell.org/ghc/ghc/-/merge_requests/3295
+    ghc-options: -Winferred-safe-imports -Wmissing-safe-haskell-mode
 
   ghc-options: -Wall
   default-language: Haskell2010
