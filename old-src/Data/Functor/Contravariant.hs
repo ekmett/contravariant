@@ -14,7 +14,9 @@
 #define MIN_VERSION_base(x,y,z) 1
 #endif
 
-#if __GLASGOW_HASKELL__ >= 702
+#if __GLASGOW_HASKELL__ >= 704
+{-# LANGUAGE Safe #-}
+#elif __GLASGOW_HASKELL__ >= 702
 {-# LANGUAGE Trustworthy #-}
 #endif
 
