@@ -1,4 +1,4 @@
-1.5.3 [202y.mm.dd]
+1.5.3 [2020.12.30]
 ------------------
 * Explicitly mark modules as `Safe`.
 
