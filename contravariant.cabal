@@ -2,8 +2,8 @@ cabal-version: 2.2
 name:          contravariant
 category:      Control, Data
 version:       1.6
-license:       BSD-2-Clause
-license-file:  LICENSE
+license:       BSD-2-Clause OR Apache-2.0
+license-file:  LICENSE.md
 author:        Edward A. Kmett
 maintainer:    Edward A. Kmett <ekmett@gmail.com>
 stability:     provisional
@@ -36,8 +36,8 @@ flag StateVar
 library
   hs-source-dirs: src
   build-depends:
-    base                              < 5,
-    transformers        >= 0.5 &&     < 0.6
+    , base >= 4.12 && < 5
+    , transformers ^>= 0.5
 
   if flag(StateVar)
     build-depends: StateVar >= 1.2.1 && < 1.3

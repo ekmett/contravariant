@@ -14,7 +14,7 @@
 
 -- |
 -- Copyright   :  (C) 2007-2021 Edward Kmett
--- License     :  BSD-style (see the file LICENSE)
+-- License     :  BSD-2-Clause OR Apache-2.0
 -- Maintainer  :  Edward Kmett <ekmett@gmail.com>
 -- Stability   :  experimental
 -- Portability :  ConstraintKinds
