@@ -1,3 +1,7 @@
+1.6 [unreleased]
+----------------
+* Drop support for GHC < 8.6
+
 1.5.3 [2020.12.30]
 ------------------
 * Explicitly mark modules as `Safe`.
