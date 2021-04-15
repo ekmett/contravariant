@@ -8,9 +8,9 @@
 #
 # For more information, see https://github.com/haskell-CI/haskell-ci
 #
-# version: 0.12
+# version: 0.12.1
 #
-# REGENDATA ("0.12",["github","--config=cabal.haskell-ci","cabal.project"])
+# REGENDATA ("0.12.1",["github","--config=cabal.haskell-ci","cabal.project"])
 #
 name: Haskell-CI
 on:
@@ -46,37 +46,17 @@ jobs:
     name: Haskell-CI - Linux - ${{ matrix.compiler }}
     runs-on: ubuntu-18.04
     container:
-      image: buildpack-deps:bionic
+      image: buildpack-deps:xenial
     continue-on-error: ${{ matrix.allow-failure }}
     strategy:
       matrix:
         include:
-          - compiler: ghc-9.0.1
-            allow-failure: false
           - compiler: ghc-8.10.4
             allow-failure: false
           - compiler: ghc-8.8.4
             allow-failure: false
           - compiler: ghc-8.6.5
             allow-failure: false
-          - compiler: ghc-8.4.4
-            allow-failure: false
-          - compiler: ghc-8.2.2
-            allow-failure: false
-          - compiler: ghc-8.0.2
-            allow-failure: false
-          - compiler: ghc-7.10.3
-            allow-failure: false
-          - compiler: ghc-7.8.4
-            allow-failure: false
-          - compiler: ghc-7.6.3
-            allow-failure: false
-          - compiler: ghc-7.4.2
-            allow-failure: false
-          - compiler: ghc-7.2.2
-            allow-failure: true
-          - compiler: ghc-7.0.4
-            allow-failure: true
       fail-fast: false
     steps:
       - name: apt
@@ -144,7 +124,7 @@ jobs:
       - name: cache (tools)
         uses: actions/cache@v2
         with:
-          key: ${{ runner.os }}-${{ matrix.compiler }}-tools-44f6870a
+          key: ${{ runner.os }}-${{ matrix.compiler }}-tools-2b1b586f
           path: ~/.haskell-ci-tools
       - name: install cabal-plan
         run: |
@@ -157,10 +137,10 @@ jobs:
           cabal-plan --version
       - name: install hlint
         run: |
-          if [ $((HCNUMVER >= 81000 && HCNUMVER < 90000)) -ne 0 ] ; then HLINTVER=$(cd /tmp && (${CABAL} v2-install -v $ARG_COMPILER --dry-run hlint  --constraint='hlint >=3.2 && <3.3' |  perl -ne 'if (/\bhlint-(\d+(\.\d+)*)\b/) { print "$1"; last; }')); echo "HLint version $HLINTVER" ; fi
-          if [ $((HCNUMVER >= 81000 && HCNUMVER < 90000)) -ne 0 ] ; then if [ ! -e $HOME/.haskell-ci-tools/hlint-$HLINTVER/hlint ]; then echo "Downloading HLint version $HLINTVER"; mkdir -p $HOME/.haskell-ci-tools; curl --write-out 'Status Code: %{http_code} Redirects: %{num_redirects} Total time: %{time_total} Total Dsize: %{size_download}\n' --silent --location --output $HOME/.haskell-ci-tools/hlint-$HLINTVER.tar.gz "https://github.com/ndmitchell/hlint/releases/download/v$HLINTVER/hlint-$HLINTVER-x86_64-linux.tar.gz"; tar -xzv -f $HOME/.haskell-ci-tools/hlint-$HLINTVER.tar.gz -C $HOME/.haskell-ci-tools; fi ; fi
-          if [ $((HCNUMVER >= 81000 && HCNUMVER < 90000)) -ne 0 ] ; then mkdir -p $CABAL_DIR/bin && ln -sf "$HOME/.haskell-ci-tools/hlint-$HLINTVER/hlint" $CABAL_DIR/bin/hlint ; fi
-          if [ $((HCNUMVER >= 81000 && HCNUMVER < 90000)) -ne 0 ] ; then hlint --version ; fi
+          if [ $((HCNUMVER >= 81000)) -ne 0 ] ; then HLINTVER=$(cd /tmp && (${CABAL} v2-install -v $ARG_COMPILER --dry-run hlint  --constraint='hlint >=3.3 && <3.4' |  perl -ne 'if (/\bhlint-(\d+(\.\d+)*)\b/) { print "$1"; last; }')); echo "HLint version $HLINTVER" ; fi
+          if [ $((HCNUMVER >= 81000)) -ne 0 ] ; then if [ ! -e $HOME/.haskell-ci-tools/hlint-$HLINTVER/hlint ]; then echo "Downloading HLint version $HLINTVER"; mkdir -p $HOME/.haskell-ci-tools; curl --write-out 'Status Code: %{http_code} Redirects: %{num_redirects} Total time: %{time_total} Total Dsize: %{size_download}\n' --silent --location --output $HOME/.haskell-ci-tools/hlint-$HLINTVER.tar.gz "https://github.com/ndmitchell/hlint/releases/download/v$HLINTVER/hlint-$HLINTVER-x86_64-linux.tar.gz"; tar -xzv -f $HOME/.haskell-ci-tools/hlint-$HLINTVER.tar.gz -C $HOME/.haskell-ci-tools; fi ; fi
+          if [ $((HCNUMVER >= 81000)) -ne 0 ] ; then mkdir -p $CABAL_DIR/bin && ln -sf "$HOME/.haskell-ci-tools/hlint-$HLINTVER/hlint" $CABAL_DIR/bin/hlint ; fi
+          if [ $((HCNUMVER >= 81000)) -ne 0 ] ; then hlint --version ; fi
       - name: checkout
         uses: actions/checkout@v2
         with:
@@ -185,8 +165,8 @@ jobs:
           touch cabal.project
           touch cabal.project.local
           echo "packages: ${PKGDIR_contravariant}" >> cabal.project
-          if [ $((HCNUMVER >= 80200)) -ne 0 ] ; then echo "package contravariant" >> cabal.project ; fi
-          if [ $((HCNUMVER >= 80200)) -ne 0 ] ; then echo "    ghc-options: -Werror=missing-methods" >> cabal.project ; fi
+          echo "package contravariant" >> cabal.project
+          echo "    ghc-options: -Werror=missing-methods" >> cabal.project
           cat >> cabal.project <<EOF
           EOF
           $HCPKG list --simple-output --names-only | perl -ne 'for (split /\s+/) { print "constraints: $_ installed\n" unless /^(contravariant)$/; }' >> cabal.project.local
@@ -211,7 +191,7 @@ jobs:
           $CABAL v2-build $ARG_COMPILER $ARG_TESTS $ARG_BENCH all --write-ghc-environment-files=always
       - name: hlint
         run: |
-          if [ $((HCNUMVER >= 81000 && HCNUMVER < 90000)) -ne 0 ] ; then (cd ${PKGDIR_contravariant} && hlint src old-src) ; fi
+          if [ $((HCNUMVER >= 81000)) -ne 0 ] ; then (cd ${PKGDIR_contravariant} && hlint src) ; fi
       - name: cabal check
         run: |
           cd ${PKGDIR_contravariant} || false
