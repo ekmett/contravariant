@@ -422,7 +422,7 @@ instance Decidable Comparison where
       Right d -> h c d
 
 instance Decidable Equivalence where
-  lose f = Equivalence $ \a -> absurd (f a)
+  lose f = Equivalence $ absurd . f
   choose f (Equivalence g) (Equivalence h) = Equivalence $ \a b -> case f a of
     Left c -> case f b of
       Left d -> g c d
@@ -432,7 +432,7 @@ instance Decidable Equivalence where
       Right d -> h c d
 
 instance Decidable Predicate where
-  lose f = Predicate $ \a -> absurd (f a)
+  lose f = Predicate $ absurd . f
   choose f (Predicate g) (Predicate h) = Predicate $ either g h . f
 
 instance Monoid r => Decidable (Op r) where
