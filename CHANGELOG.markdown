@@ -5,6 +5,10 @@
   `transformers`. These data types were previously deprecated and have been
   removed in `transformers-0.6.*`.
 
+1.5.4 [2021.07.25]
+------------------
+* Allow building with `transformers-0.6.*`.
+
 1.5.3 [2020.12.30]
 ------------------
 * Explicitly mark modules as `Safe`.
