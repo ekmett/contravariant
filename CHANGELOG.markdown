@@ -1,6 +1,9 @@
 1.6 [unreleased]
 ----------------
 * Drop support for GHC < 8.6
+* Remove `Contravariant` instances for `ErrorT` and `ListT` from
+  `transformers`. These data types were previously deprecated and have been
+  removed in `transformers-0.6.*`.
 
 1.5.3 [2020.12.30]
 ------------------

@@ -3,8 +3,6 @@
 {-# LANGUAGE BlockArguments #-}
 {-# LANGUAGE Safe #-}
 
-{-# OPTIONS_GHC -fno-warn-deprecations #-}
-
 -- |
 -- Copyright   :  (C) 2014-2021 Edward Kmett
 -- License     :  BSD-2-Clause OR Apache-2.0
@@ -34,10 +32,8 @@ module Data.Functor.Contravariant.Divisible
 import Control.Applicative
 import Control.Applicative.Backwards
 import Control.Arrow
-import Control.Monad.Trans.Error
 import Control.Monad.Trans.Except
 import Control.Monad.Trans.Identity
-import Control.Monad.Trans.List
 import Control.Monad.Trans.Maybe
 import qualified Control.Monad.Trans.RWS.Lazy as Lazy
 import qualified Control.Monad.Trans.RWS.Strict as Strict
@@ -47,7 +43,6 @@ import qualified Control.Monad.Trans.State.Strict as Strict
 import qualified Control.Monad.Trans.Writer.Lazy as Lazy
 import qualified Control.Monad.Trans.Writer.Strict as Strict
 
-import Data.Either
 import Data.Functor.Compose
 import Data.Functor.Constant
 import Data.Functor.Contravariant
@@ -222,10 +217,6 @@ instance Divisible f => Divisible (Backwards f) where
   divide f (Backwards l) (Backwards r) = Backwards $ divide f l r
   conquer = Backwards conquer
 
-instance Divisible m => Divisible (ErrorT e m) where
-  divide f (ErrorT l) (ErrorT r) = ErrorT $ divide (funzip . fmap f) l r
-  conquer = ErrorT conquer
-
 instance Divisible m => Divisible (ExceptT e m) where
   divide f (ExceptT l) (ExceptT r) = ExceptT $ divide (funzip . fmap f) l r
   conquer = ExceptT conquer
@@ -233,10 +224,6 @@ instance Divisible m => Divisible (ExceptT e m) where
 instance Divisible f => Divisible (IdentityT f) where
   divide f (IdentityT l) (IdentityT r) = IdentityT $ divide f l r
   conquer = IdentityT conquer
-
-instance Divisible m => Divisible (ListT m) where
-  divide f (ListT l) (ListT r) = ListT $ divide (funzip . map f) l r
-  conquer = ListT conquer
 
 instance Divisible m => Divisible (MaybeT m) where
   divide f (MaybeT l) (MaybeT r) = MaybeT $ divide (funzip . fmap f) l r
@@ -469,10 +456,6 @@ instance Decidable m => Decidable (Strict.RWST r w s m) where
                                   (Right . betuple3 s' w)
                                   (abc a))
            (rsmb r s) (rsmc r s)
-
-instance Divisible m => Decidable (ListT m) where
-  lose _ = ListT conquer
-  choose f (ListT l) (ListT r) = ListT $ divide ((lefts &&& rights) . map f) l r
 
 instance Divisible m => Decidable (MaybeT m) where
   lose _ = MaybeT conquer
