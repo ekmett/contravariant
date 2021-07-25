@@ -63,7 +63,7 @@ library
   hs-source-dirs: src
   build-depends:
     base                              < 5,
-    transformers        >= 0.3 &&     < 0.6
+    transformers        >= 0.3 &&     < 0.7
 
   if !impl(ghc > 7.10)
     build-depends: transformers-compat >= 0.5 && < 1

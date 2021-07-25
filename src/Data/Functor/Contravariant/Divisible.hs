@@ -6,7 +6,9 @@
 {-# LANGUAGE Trustworthy #-}
 #endif
 
+#if !(MIN_VERSION_transformers(0,6,0))
 {-# OPTIONS_GHC -fno-warn-deprecations #-}
+#endif
 
 -----------------------------------------------------------------------------
 -- |
@@ -40,10 +42,8 @@ module Data.Functor.Contravariant.Divisible
 import Control.Applicative
 import Control.Applicative.Backwards
 import Control.Arrow
-import Control.Monad.Trans.Error
 import Control.Monad.Trans.Except
 import Control.Monad.Trans.Identity
-import Control.Monad.Trans.List
 import Control.Monad.Trans.Maybe
 import qualified Control.Monad.Trans.RWS.Lazy as Lazy
 import qualified Control.Monad.Trans.RWS.Strict as Strict
@@ -53,13 +53,18 @@ import qualified Control.Monad.Trans.State.Strict as Strict
 import qualified Control.Monad.Trans.Writer.Lazy as Lazy
 import qualified Control.Monad.Trans.Writer.Strict as Strict
 
-import Data.Either
 import Data.Functor.Compose
 import Data.Functor.Constant
 import Data.Functor.Contravariant
 import Data.Functor.Product
 import Data.Functor.Reverse
 import Data.Void
+
+#if !(MIN_VERSION_transformers(0,6,0))
+import Control.Monad.Trans.Error
+import Control.Monad.Trans.List
+import Data.Either
+#endif
 
 #if MIN_VERSION_base(4,8,0)
 import Data.Monoid (Alt(..))
@@ -241,10 +246,6 @@ instance Divisible f => Divisible (Backwards f) where
   divide f (Backwards l) (Backwards r) = Backwards $ divide f l r
   conquer = Backwards conquer
 
-instance Divisible m => Divisible (ErrorT e m) where
-  divide f (ErrorT l) (ErrorT r) = ErrorT $ divide (funzip . fmap f) l r
-  conquer = ErrorT conquer
-
 instance Divisible m => Divisible (ExceptT e m) where
   divide f (ExceptT l) (ExceptT r) = ExceptT $ divide (funzip . fmap f) l r
   conquer = ExceptT conquer
@@ -252,10 +253,6 @@ instance Divisible m => Divisible (ExceptT e m) where
 instance Divisible f => Divisible (IdentityT f) where
   divide f (IdentityT l) (IdentityT r) = IdentityT $ divide f l r
   conquer = IdentityT conquer
-
-instance Divisible m => Divisible (ListT m) where
-  divide f (ListT l) (ListT r) = ListT $ divide (funzip . map f) l r
-  conquer = ListT conquer
 
 instance Divisible m => Divisible (MaybeT m) where
   divide f (MaybeT l) (MaybeT r) = MaybeT $ divide (funzip . fmap f) l r
@@ -495,9 +492,19 @@ instance Decidable m => Decidable (Strict.RWST r w s m) where
                                   (abc a))
            (rsmb r s) (rsmc r s)
 
+#if !(MIN_VERSION_transformers(0,6,0))
+instance Divisible m => Divisible (ErrorT e m) where
+  divide f (ErrorT l) (ErrorT r) = ErrorT $ divide (funzip . fmap f) l r
+  conquer = ErrorT conquer
+
+instance Divisible m => Divisible (ListT m) where
+  divide f (ListT l) (ListT r) = ListT $ divide (funzip . map f) l r
+  conquer = ListT conquer
+
 instance Divisible m => Decidable (ListT m) where
   lose _ = ListT conquer
   choose f (ListT l) (ListT r) = ListT $ divide ((lefts &&& rights) . map f) l r
+#endif
 
 instance Divisible m => Decidable (MaybeT m) where
   lose _ = MaybeT conquer

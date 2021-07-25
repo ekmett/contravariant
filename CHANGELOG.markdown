@@ -1,3 +1,7 @@
+next [????.??.??]
+-----------------
+* Allow building with `transformers-0.6.*`.
+
 1.5.3 [2020.12.30]
 ------------------
 * Explicitly mark modules as `Safe`.
