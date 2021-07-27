@@ -5,6 +5,10 @@
   `transformers`. These data types were previously deprecated and have been
   removed in `transformers-0.6.*`.
 
+1.5.5 [2021.07.27]
+------------------
+* Fix the build on old GHCs using `transformers-0.6.*`.
+
 1.5.4 [2021.07.25]
 ------------------
 * Allow building with `transformers-0.6.*`.
