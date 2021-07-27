@@ -20,7 +20,9 @@
 {-# LANGUAGE Trustworthy #-}
 #endif
 
+#if !(MIN_VERSION_transformers(0,6,0))
 {-# OPTIONS_GHC -fno-warn-deprecations #-}
+#endif
 
 -----------------------------------------------------------------------------
 -- |
@@ -66,10 +68,8 @@ import Control.Applicative.Backwards
 
 import Control.Category
 
-import Control.Monad.Trans.Error
 import Control.Monad.Trans.Except
 import Control.Monad.Trans.Identity
-import Control.Monad.Trans.List
 import Control.Monad.Trans.Maybe
 import qualified Control.Monad.Trans.RWS.Lazy as Lazy
 import qualified Control.Monad.Trans.RWS.Strict as Strict
@@ -86,6 +86,11 @@ import Data.Functor.Sum
 import Data.Functor.Constant
 import Data.Functor.Compose
 import Data.Functor.Reverse
+
+#if !(MIN_VERSION_transformers(0,6,0))
+import Control.Monad.Trans.Error
+import Control.Monad.Trans.List
+#endif
 
 #if MIN_VERSION_base(4,8,0)
 import Data.Monoid (Alt(..))
@@ -222,17 +227,11 @@ instance (Contravariant f, Contravariant g) => Contravariant (f :+: g) where
   contramap f (R1 ys) = R1 (contramap f ys)
 #endif
 
-instance Contravariant m => Contravariant (ErrorT e m) where
-  contramap f = ErrorT . contramap (fmap f) . runErrorT
-
 instance Contravariant m => Contravariant (ExceptT e m) where
   contramap f = ExceptT . contramap (fmap f) . runExceptT
 
 instance Contravariant f => Contravariant (IdentityT f) where
   contramap f = IdentityT . contramap f . runIdentityT
-
-instance Contravariant m => Contravariant (ListT m) where
-  contramap f = ListT . contramap (fmap f) . runListT
 
 instance Contravariant m => Contravariant (MaybeT m) where
   contramap f = MaybeT . contramap (fmap f) . runMaybeT
@@ -286,6 +285,14 @@ instance Contravariant f => Contravariant (Backwards f) where
 instance Contravariant f => Contravariant (Reverse f) where
   contramap f = Reverse . contramap f . getReverse
   {-# INLINE contramap #-}
+
+#if !(MIN_VERSION_transformers(0,6,0))
+instance Contravariant m => Contravariant (ErrorT e m) where
+  contramap f = ErrorT . contramap (fmap f) . runErrorT
+
+instance Contravariant m => Contravariant (ListT m) where
+  contramap f = ListT . contramap (fmap f) . runListT
+#endif
 
 #ifdef MIN_VERSION_StateVar
 instance Contravariant SettableStateVar where

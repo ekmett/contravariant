@@ -1,3 +1,7 @@
+next [????.??.??]
+-----------------
+* Fix the build on old GHCs using `transformers-0.6.*`.
+
 1.5.4 [2021.07.25]
 ------------------
 * Allow building with `transformers-0.6.*`.
