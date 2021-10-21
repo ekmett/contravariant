@@ -2,7 +2,7 @@ contravariant
 =============
 
 [![Hackage](https://img.shields.io/hackage/v/contravariant.svg)](https://hackage.haskell.org/package/contravariant)
-[![Build Status](https://secure.travis-ci.org/ekmett/contravariant.svg?branch=master)](http://travis-ci.org/ekmett/contravariant)
+[![Build Status](https://github.com/ekmett/contravariant/workflows/Haskell-CI/badge.svg)](https://github.com/ekmett/contravariant/actions?query=workflow%3AHaskell-CI)
 
 Haskell 98 contravariant functors
 

@@ -1,3 +1,22 @@
+1.6 [unreleased]
+----------------
+* Drop support for GHC < 8.6
+* Remove `Contravariant` instances for `ErrorT` and `ListT` from
+  `transformers`. These data types were previously deprecated and have been
+  removed in `transformers-0.6.*`.
+
+1.5.5 [2021.07.27]
+------------------
+* Fix the build on old GHCs using `transformers-0.6.*`.
+
+1.5.4 [2021.07.25]
+------------------
+* Allow building with `transformers-0.6.*`.
+
+1.5.3 [2020.12.30]
+------------------
+* Explicitly mark modules as `Safe`.
+
 1.5.2 [2019.06.03]
 ------------------
 * Mark `Data.Functor.Contravariant` and `Data.Functor.Contravariant.Generic`
