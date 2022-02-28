@@ -30,7 +30,6 @@ module Data.Functor.Contravariant.Divisible
 
 -- ** Decidable
 -- $decidable
-
 ) where
 
 import Control.Applicative
