@@ -621,7 +621,7 @@ instance Decidable SettableStateVar where
 -- greeting = string "Hello " '>*' showing
 -- @
 (>*) :: Divisible f => f () -> f a -> f a
-before >* p = ((),) >$< before >*< p
+(>*) = divide ((),)
 
 infixr 5 >*
 
@@ -632,7 +632,7 @@ infixr 5 >*
 -- emphatic opstring = opstring '*<' string "!"
 -- @
 (*<) :: Divisible f => f a -> f () -> f a
-p *< after = (,()) >$< p >*< after
+(*<) = divide (,())
 
 infixr 5 *<
 
