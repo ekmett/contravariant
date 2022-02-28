@@ -1,4 +1,5 @@
 {-# LANGUAGE CPP #-}
+{-# LANGUAGE TupleSections #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE BlockArguments #-}
 {-# LANGUAGE Safe #-}
@@ -17,7 +18,9 @@ module Data.Functor.Contravariant.Divisible
 -- * Contravariant Applicative
   Divisible(..), divided, conquered, liftD
 -- * Contravariant Alternative
-, Decidable(..), chosen, lost, (>*<)
+, Decidable(..), chosen, lost, (>*<), (>*), (*<)
+-- * Printer Combinators
+, optionalD, manyD, many1D, sepByD, sepBy1D
 -- * Mathematical definitions
 -- ** Divisible
 -- $divisible
@@ -27,6 +30,7 @@ module Data.Functor.Contravariant.Divisible
 
 -- ** Decidable
 -- $decidable
+
 ) where
 
 import Control.Applicative
@@ -50,6 +54,7 @@ import Data.Functor.Product
 import Data.Functor.Reverse
 import Data.Void
 
+import Data.List (uncons)
 import Data.Monoid (Alt(..))
 
 import Data.Proxy
@@ -603,3 +608,58 @@ instance Decidable SettableStateVar where
 -- In addition, we expect the same kind of distributive law as is satisfied by the usual
 -- covariant 'Alternative', w.r.t 'Applicative', which should be fully formulated and
 -- added here at some point!
+
+-- | Analagous to `(*>)`
+--
+-- @
+-- showing :: 'Show' a => 'Op' 'String' a
+-- showing = 'Op' 'show'
+--
+-- string :: String -> 'Op' 'String' ()
+-- string = 'Op' '.' 'const'
+--
+-- greeting :: Show a => 'Op' 'String' a
+-- greeting = string "Hello " '>*' showing
+-- @
+(>*) :: Divisible f => f () -> f a -> f a
+before >* p = ((),) >$< before >*< p
+
+infixr 5 >*
+
+-- | Analagous to `(<*)`
+--
+-- @
+-- emphatic :: 'Op' 'String' a -> 'Op' 'String' a
+-- emphatic opstring = opstring '*<' string "!"
+-- @
+(*<) :: Divisible f => f a -> f () -> f a
+p *< after = (,()) >$< p >*< after
+
+infixr 5 *<
+
+mayhaps :: Maybe a -> Either () a
+mayhaps m = case m of
+  Nothing -> Left ()
+  Just a -> Right a
+
+-- | Zero or one.
+optionalD :: Decidable f => f a -> f (Maybe a)
+optionalD = choose mayhaps conquered
+
+-- | Zero or more.
+manyD :: Decidable f => f a -> f [a]
+manyD p = choose (mayhaps . uncons) conquered (many1D p)
+
+-- | One or more.
+many1D :: Decidable f => f a -> f (a,[a])
+many1D p = p >*< manyD p
+
+-- | @'sepByD' p sep@ prints zero or more occurrences of @p@, separated by @sep@.
+-- Consumes a list of values required by @p@.
+sepByD :: Decidable f => f () -> f a -> f [a]
+sepByD sep p = choose (mayhaps . uncons) conquered (sepBy1D sep p)
+
+-- | @'sepByD' p sep@ prints one or more occurrences of @p@, separated by @sep@.
+-- Consumes a list of values required by @p@.
+sepBy1D :: Decidable f => f () -> f a -> f (a,[a])
+sepBy1D sep p = p >*< manyD (sep >* p)
