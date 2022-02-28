@@ -16,9 +16,9 @@
 module Data.Functor.Contravariant.Divisible
 (
 -- * Contravariant Applicative
-  Divisible(..), divided, conquered, liftD
+  Divisible(..), divided, conquered, liftD, (>*<), (>*), (*<)
 -- * Contravariant Alternative
-, Decidable(..), chosen, lost, (>*<), (>*), (*<)
+, Decidable(..), chosen, lost
 -- * Printer Combinators
 , optionalD, manyD, many1D, sepByD, sepBy1D
 -- * Mathematical definitions
