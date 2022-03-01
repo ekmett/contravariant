@@ -665,7 +665,7 @@ many1D p = thither >$< p >*< manyD p
 sepByD :: Decidable f => f () -> f a -> f [a]
 sepByD sep p = choose (mayhaps . uncons) conquered (hither >$< sepBy1D sep p)
 
--- | @'sepByD' sep p@ prints one or more occurrences of @p@, separated by @sep@.
+-- | @'sepBy1D' sep p@ prints one or more occurrences of @p@, separated by @sep@.
 -- Consumes a list of values required by @p@.
 sepBy1D :: Decidable f => f () -> f a -> f (NonEmpty a)
 sepBy1D sep p = thither >$< p >*< manyD (sep >* p)
