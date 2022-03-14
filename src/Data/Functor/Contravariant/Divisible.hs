@@ -642,30 +642,32 @@ mayhaps m = case m of
   Nothing -> Left ()
   Just a -> Right a
 
-hither :: (a,[a]) -> NonEmpty a
-hither (a,as) = a:|as
-
-thither :: NonEmpty a -> (a,[a])
-thither (a:|as) = (a,as)
-
 -- | Zero or one.
 optionalD :: Decidable f => f a -> f (Maybe a)
 optionalD = choose mayhaps conquered
 
 -- | Zero or more.
 manyD :: Decidable f => f a -> f [a]
-manyD p = choose (mayhaps . uncons) conquered (hither >$< many1D p)
+manyD p = choose (mayhaps . uncons) conquered (many1D' p)
+
+-- Helper for `manyD` and `many1D`.
+many1D' :: Decidable f => f a -> f (a,[a])
+many1D' p = p >*< manyD p
 
 -- | One or more.
 many1D :: Decidable f => f a -> f (NonEmpty a)
-many1D p = thither >$< p >*< manyD p
+many1D p = contramap (\(a:|as) -> (a,as)) (many1D' p)
 
 -- | @'sepByD' sep p@ prints zero or more occurrences of @p@, separated by @sep@.
 -- Consumes a list of values required by @p@.
 sepByD :: Decidable f => f () -> f a -> f [a]
-sepByD sep p = choose (mayhaps . uncons) conquered (hither >$< sepBy1D sep p)
+sepByD sep p = choose (mayhaps . uncons) conquered (sepBy1D' sep p)
+
+-- Helper for `sepByD` and `sepBy1D`.
+sepBy1D' :: Decidable f => f () -> f a -> f (a,[a])
+sepBy1D' sep p = p >*< manyD (sep >* p)
 
 -- | @'sepBy1D' sep p@ prints one or more occurrences of @p@, separated by @sep@.
 -- Consumes a list of values required by @p@.
 sepBy1D :: Decidable f => f () -> f a -> f (NonEmpty a)
-sepBy1D sep p = thither >$< p >*< manyD (sep >* p)
+sepBy1D sep p = contramap (\(a:|as) -> (a,as)) (sepBy1D' sep p)
