@@ -1,4 +1,5 @@
 {-# LANGUAGE CPP #-}
+{-# LANGUAGE RankNTypes #-}
 
 import Data.Functor.Contravariant
 import Data.Functor.Contravariant.Divisible

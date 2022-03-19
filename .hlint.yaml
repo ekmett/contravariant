@@ -3,3 +3,4 @@
 - ignore: {name: Eta reduce}
 - ignore: {name: Use const}
 - ignore: {name: Use first}
+- ignore: {name: Use void, within: [Data.Functor.Contravariant]}
