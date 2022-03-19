@@ -1,4 +1,4 @@
-- arguments: [--cpp-define=HLINT, --cpp-define=GHC_GENERICS, --cpp-ansi]
+- arguments: [-XCPP, --cpp-define=HLINT, --cpp-define=GHC_GENERICS, --cpp-ansi]
 
 - ignore: {name: Eta reduce}
 - ignore: {name: Use const}
