@@ -91,7 +91,7 @@ import GHC.Generics
 -- @contramap f s :: Serializer b@.
 --
 -- Divisible gives us a way to combine two serializers that focus on different
--- parts of a structure. If we postulate the existance of two primitive
+-- parts of a structure. If we postulate the existence of two primitive
 -- serializers - @string :: Serializer String@ and @int :: Serializer Int@, we
 -- would like to be able to combine these into a serializer for pairs of
 -- @String@s and @Int@s. How can we do this? Simply run both serializers and
