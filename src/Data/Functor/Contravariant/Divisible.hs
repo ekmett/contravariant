@@ -589,8 +589,8 @@ instance Decidable SettableStateVar where
 
 -- $decidable
 --
--- A 'Divisible' contravariant functor is a monoid object in the category of presheaves
--- from Hask to Hask, equipped with Day convolution mapping the cartesian product of the
+-- A 'Decidable' contravariant functor is a monoid object in the category of presheaves
+-- from Hask to Hask, equipped with Day convolution mapping the coproduct of the
 -- source to the Cartesian product of the target.
 --
 -- @
