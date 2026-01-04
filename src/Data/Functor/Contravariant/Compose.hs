@@ -1,9 +1,5 @@
 {-# LANGUAGE CPP #-}
-#if __GLASGOW_HASKELL__ >= 704
 {-# LANGUAGE Safe #-}
-#elif __GLASGOW_HASKELL__ >= 702
-{-# LANGUAGE Trustworthy #-}
-#endif
 -- |
 -- Module      :  Data.Functor.Contravariant.Compose
 -- Copyright   :  (c) Edward Kmett 2010
@@ -22,10 +18,6 @@ module Data.Functor.Contravariant.Compose
   ) where
 
 import Control.Arrow
-
-#if __GLASGOW_HASKELL__ < 710
-import Control.Applicative
-#endif
 
 import Data.Functor.Contravariant
 import Data.Functor.Contravariant.Divisible

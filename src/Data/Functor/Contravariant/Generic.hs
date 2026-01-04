@@ -1,9 +1,5 @@
 {-# LANGUAGE CPP #-}
-#if __GLASGOW_HASKELL__ >= 704
 {-# LANGUAGE Safe #-}
-#elif __GLASGOW_HASKELL__ >= 702
-{-# LANGUAGE Trustworthy #-}
-#endif
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE FlexibleInstances #-}
@@ -11,13 +7,9 @@
 {-# LANGUAGE Rank2Types #-}
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE FlexibleContexts #-}
-#if __GLASGOW_HASKELL__ >= 706
 {-# LANGUAGE PolyKinds #-}
-#endif
 {-# LANGUAGE TypeFamilies #-}
-#if __GLASGOW_HASKELL__ >= 708
 {-# LANGUAGE EmptyCase #-}
-#endif
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Data.Functor.Contravariant.Generic
@@ -165,11 +157,7 @@ instance (GDeciding1 q f, GDeciding1 q g) => GDeciding1 q (f ::+: g) where
   gdeciding1 p q r = gchoose (gdeciding1 p q r) (gdeciding1 p q r)
 
 absurd1 :: V1 a -> b
-#if defined(HLINT) || (__GLASGOW_HASKELL__ < 708)
-absurd1 x = x `seq` error "impossible"
-#else
 absurd1 x = case x of
-#endif
 
 glose :: Decidable f => f (V1 a)
 glose = lose absurd1

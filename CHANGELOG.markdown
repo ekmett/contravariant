@@ -1,3 +1,7 @@
+next [????.??.??]
+-----------------
+* Drop support for pre-8.0 versions of GHC.
+
 1.5.5 [2021.07.27]
 ------------------
 * Fix the build on old GHCs using `transformers-0.6.*`.

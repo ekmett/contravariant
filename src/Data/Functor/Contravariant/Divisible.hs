@@ -1,13 +1,9 @@
 {-# LANGUAGE CPP #-}
 {-# LANGUAGE TypeOperators #-}
-#if __GLASGOW_HASKELL__ >= 704
 {-# LANGUAGE Safe #-}
-#elif __GLASGOW_HASKELL__ >= 702
-{-# LANGUAGE Trustworthy #-}
-#endif
 
 #if !(MIN_VERSION_transformers(0,6,0))
-{-# OPTIONS_GHC -fno-warn-deprecations #-}
+{-# OPTIONS_GHC -Wno-deprecations #-}
 #endif
 
 -----------------------------------------------------------------------------
@@ -58,7 +54,11 @@ import Data.Functor.Constant
 import Data.Functor.Contravariant
 import Data.Functor.Product
 import Data.Functor.Reverse
+import Data.Monoid (Alt(..))
+import Data.Proxy
 import Data.Void
+
+import GHC.Generics
 
 #if !(MIN_VERSION_transformers(0,6,0))
 import Control.Monad.Trans.Error
@@ -66,23 +66,8 @@ import Control.Monad.Trans.List
 import Data.Either
 #endif
 
-#if MIN_VERSION_base(4,8,0)
-import Data.Monoid (Alt(..))
-#else
-import Data.Monoid (Monoid(..))
-#endif
-
-#if MIN_VERSION_base(4,7,0) || defined(MIN_VERSION_tagged)
-import Data.Proxy
-#endif
-
 #ifdef MIN_VERSION_StateVar
 import Data.StateVar
-#endif
-
-#if __GLASGOW_HASKELL__ >= 702
-#define GHC_GENERICS
-import GHC.Generics
 #endif
 
 --------------------------------------------------------------------------------
@@ -214,13 +199,10 @@ instance Monoid m => Divisible (Const m) where
   divide _ (Const a) (Const b) = Const (mappend a b)
   conquer = Const mempty
 
-#if MIN_VERSION_base(4,8,0)
 instance Divisible f => Divisible (Alt f) where
   divide f (Alt l) (Alt r) = Alt $ divide f l r
   conquer = Alt conquer
-#endif
 
-#ifdef GHC_GENERICS
 instance Divisible U1 where
   divide _ U1 U1 = U1
   conquer = U1
@@ -240,7 +222,6 @@ instance (Divisible f, Divisible g) => Divisible (f :*: g) where
 instance (Applicative f, Divisible g) => Divisible (f :.: g) where
   divide f (Comp1 l) (Comp1 r) = Comp1 (divide f <$> l <*> r)
   conquer = Comp1 $ pure conquer
-#endif
 
 instance Divisible f => Divisible (Backwards f) where
   divide f (Backwards l) (Backwards r) = Backwards $ divide f l r
@@ -312,11 +293,9 @@ instance Divisible f => Divisible (Reverse f) where
   divide f (Reverse l) (Reverse r) = Reverse $ divide f l r
   conquer = Reverse conquer
 
-#if MIN_VERSION_base(4,7,0) || defined(MIN_VERSION_tagged)
 instance Divisible Proxy where
   divide _ Proxy Proxy = Proxy
   conquer = Proxy
-#endif
 
 #ifdef MIN_VERSION_StateVar
 instance Divisible SettableStateVar where
@@ -436,13 +415,10 @@ instance Monoid r => Decidable (Op r) where
   lose f = Op $ absurd . f
   choose f (Op g) (Op h) = Op $ either g h . f
 
-#if MIN_VERSION_base(4,8,0)
 instance Decidable f => Decidable (Alt f) where
   lose = Alt . lose
   choose f (Alt l) (Alt r) = Alt $ choose f l r
-#endif
 
-#ifdef GHC_GENERICS
 instance Decidable U1 where
   lose _ = U1
   choose _ U1 U1 = U1
@@ -462,7 +438,6 @@ instance (Decidable f, Decidable g) => Decidable (f :*: g) where
 instance (Applicative f, Decidable g) => Decidable (f :.: g) where
   lose = Comp1 . pure . lose
   choose f (Comp1 l) (Comp1 r) = Comp1 (choose f <$> l <*> r)
-#endif
 
 instance Decidable f => Decidable (Backwards f) where
   lose = Backwards . lose
@@ -557,11 +532,9 @@ betuple3 s w a = (a, s, w)
 lazyFst :: (a, b) -> a
 lazyFst ~(a, _) = a
 
-#if MIN_VERSION_base(4,7,0) || defined(MIN_VERSION_tagged)
 instance Decidable Proxy where
   lose _ = Proxy
   choose _ Proxy Proxy = Proxy
-#endif
 
 #ifdef MIN_VERSION_StateVar
 instance Decidable SettableStateVar where

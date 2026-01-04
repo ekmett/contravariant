@@ -1,27 +1,13 @@
 {-# LANGUAGE CPP #-}
+{-# LANGUAGE Safe #-}
 {-# LANGUAGE TypeOperators #-}
-
-#ifdef __GLASGOW_HASKELL__
-#define LANGUAGE_DeriveDataTypeable
-{-# LANGUAGE DeriveDataTypeable #-}
-#endif
-
-#ifndef MIN_VERSION_tagged
-#define MIN_VERSION_tagged(x,y,z) 1
-#endif
 
 #ifndef MIN_VERSION_base
 #define MIN_VERSION_base(x,y,z) 1
 #endif
 
-#if __GLASGOW_HASKELL__ >= 704
-{-# LANGUAGE Safe #-}
-#elif __GLASGOW_HASKELL__ >= 702
-{-# LANGUAGE Trustworthy #-}
-#endif
-
 #if !(MIN_VERSION_transformers(0,6,0))
-{-# OPTIONS_GHC -fno-warn-deprecations #-}
+{-# OPTIONS_GHC -Wno-deprecations #-}
 #endif
 
 -----------------------------------------------------------------------------
@@ -87,36 +73,19 @@ import Data.Functor.Constant
 import Data.Functor.Compose
 import Data.Functor.Reverse
 
+import Data.Monoid (Alt(..))
+import Data.Proxy (Proxy(..))
+import Data.Semigroup (Semigroup(..))
+
+import GHC.Generics
+
 #if !(MIN_VERSION_transformers(0,6,0))
 import Control.Monad.Trans.Error
 import Control.Monad.Trans.List
 #endif
 
-#if MIN_VERSION_base(4,8,0)
-import Data.Monoid (Alt(..))
-#else
-import Data.Monoid (Monoid(..))
-#endif
-
-#if defined(MIN_VERSION_semigroups) || __GLASGOW_HASKELL__ >= 711
-import Data.Semigroup (Semigroup(..))
-#endif
-
-#ifdef LANGUAGE_DeriveDataTypeable
-import Data.Typeable
-#endif
-
-#if defined(__GLASGOW_HASKELL__) && __GLASGOW_HASKELL__ < 707 && defined(VERSION_tagged)
-import Data.Proxy
-#endif
-
 #ifdef MIN_VERSION_StateVar
 import Data.StateVar
-#endif
-
-#if __GLASGOW_HASKELL__ >= 702
-#define GHC_GENERICS
-import GHC.Generics
 #endif
 
 import Prelude hiding ((.),id)
@@ -194,12 +163,9 @@ infixl 4 >$, $<, >$<, >$$<
 (>$$<) = flip contramap
 {-# INLINE (>$$<) #-}
 
-#if MIN_VERSION_base(4,8,0)
 instance Contravariant f => Contravariant (Alt f) where
   contramap f = Alt . contramap f . getAlt
-#endif
 
-#ifdef GHC_GENERICS
 instance Contravariant V1 where
   contramap _ x = x `seq` undefined
 
@@ -225,7 +191,6 @@ instance (Functor f, Contravariant g) => Contravariant (f :.: g) where
 instance (Contravariant f, Contravariant g) => Contravariant (f :+: g) where
   contramap f (L1 xs) = L1 (contramap f xs)
   contramap f (R1 ys) = R1 (contramap f ys)
-#endif
 
 instance Contravariant m => Contravariant (ExceptT e m) where
   contramap f = ExceptT . contramap (fmap f) . runExceptT
@@ -300,52 +265,36 @@ instance Contravariant SettableStateVar where
   {-# INLINE contramap #-}
 #endif
 
-#if (__GLASGOW_HASKELL__ >= 707) || defined(VERSION_tagged)
 instance Contravariant Proxy where
   contramap _ _ = Proxy
-#endif
 
 newtype Predicate a = Predicate { getPredicate :: a -> Bool }
-#ifdef LANGUAGE_DeriveDataTypeable
-  deriving Typeable
-#endif
 
 -- | A 'Predicate' is a 'Contravariant' 'Functor', because 'contramap' can
 -- apply its function argument to the input of the predicate.
 instance Contravariant Predicate where
   contramap f g = Predicate $ getPredicate g . f
 
-#if defined(MIN_VERSION_semigroups) || __GLASGOW_HASKELL__ >= 711
 instance Semigroup (Predicate a) where
   Predicate p <> Predicate q = Predicate $ \a -> p a && q a
-#endif
 
 instance Monoid (Predicate a) where
   mempty = Predicate $ const True
-#if defined(MIN_VERSION_semigroups) || __GLASGOW_HASKELL__ >= 711
   mappend = (<>)
-#else
-  mappend (Predicate p) (Predicate q) = Predicate $ \a -> p a && q a
-#endif
 
 -- | Defines a total ordering on a type as per 'compare'.
 --
 -- This condition is not checked by the types. You must ensure that the supplied
 -- values are valid total orderings yourself.
 newtype Comparison a = Comparison { getComparison :: a -> a -> Ordering }
-#ifdef LANGUAGE_DeriveDataTypeable
-  deriving Typeable
-#endif
 
 -- | A 'Comparison' is a 'Contravariant' 'Functor', because 'contramap' can
 -- apply its function argument to each input of the comparison function.
 instance Contravariant Comparison where
   contramap f g = Comparison $ on (getComparison g) f
 
-#if defined(MIN_VERSION_semigroups) || __GLASGOW_HASKELL__ >= 711
 instance Semigroup (Comparison a) where
   Comparison p <> Comparison q = Comparison $ mappend p q
-#endif
 
 instance Monoid (Comparison a) where
   mempty = Comparison (\_ _ -> EQ)
@@ -377,9 +326,6 @@ defaultComparison = Comparison compare
 --
 -- The types alone do not enforce these laws, so you'll have to check them yourself.
 newtype Equivalence a = Equivalence { getEquivalence :: a -> a -> Bool }
-#ifdef LANGUAGE_DeriveDataTypeable
-  deriving Typeable
-#endif
 
 -- | Equivalence relations are 'Contravariant', because you can
 -- apply the contramapped function to each input to the equivalence
@@ -387,10 +333,8 @@ newtype Equivalence a = Equivalence { getEquivalence :: a -> a -> Bool }
 instance Contravariant Equivalence where
   contramap f g = Equivalence $ on (getEquivalence g) f
 
-#if defined(MIN_VERSION_semigroups) || __GLASGOW_HASKELL__ >= 711
 instance Semigroup (Equivalence a) where
   Equivalence p <> Equivalence q = Equivalence $ \a b -> p a b && q a b
-#endif
 
 instance Monoid (Equivalence a) where
   mempty = Equivalence (\_ _ -> True)
@@ -407,9 +351,6 @@ comparisonEquivalence (Comparison p) = Equivalence $ \a b -> p a b == EQ
 
 -- | Dual function arrows.
 newtype Op a b = Op { getOp :: b -> a }
-#ifdef LANGUAGE_DeriveDataTypeable
-  deriving Typeable
-#endif
 
 instance Category Op where
   id = Op id
@@ -418,16 +359,13 @@ instance Category Op where
 instance Contravariant (Op a) where
   contramap f g = Op (getOp g . f)
 
-#if defined(MIN_VERSION_semigroups) || __GLASGOW_HASKELL__ >= 711
 instance Semigroup a => Semigroup (Op a b) where
   Op p <> Op q = Op $ \a -> p a <> q a
-#endif
 
 instance Monoid a => Monoid (Op a b) where
   mempty = Op (const mempty)
   mappend (Op p) (Op q) = Op $ \a -> mappend (p a) (q a)
 
-#if MIN_VERSION_base(4,5,0)
 instance Num a => Num (Op a b) where
   Op f + Op g = Op $ \a -> f a + g a
   Op f * Op g = Op $ \a -> f a * g a
@@ -460,4 +398,3 @@ instance Floating a => Floating (Op a b) where
   acosh (Op f) = Op $ acosh . f
   Op f ** Op g = Op $ \a -> f a ** g a
   logBase (Op f) (Op g) = Op $ \a -> logBase (f a) (g a)
-#endif
