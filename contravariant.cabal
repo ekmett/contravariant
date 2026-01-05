@@ -56,7 +56,11 @@ library
   exposed-modules:
     Data.Functor.Contravariant.Compose
     Data.Functor.Contravariant.Divisible
-    Data.Functor.Contravariant.Generic
+
+  if impl(ghc)
+    -- MicroHs doesn't support type families yet
+    exposed-modules:
+      Data.Functor.Contravariant.Generic
 
   if impl(ghc < 8.5)
     hs-source-dirs: old-src
