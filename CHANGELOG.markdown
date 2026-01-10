@@ -1,6 +1,7 @@
 next [????.??.??]
 -----------------
 * Drop support for pre-8.0 versions of GHC.
+* Support building with MicroHs.
 
 1.5.5 [2021.07.27]
 ------------------
