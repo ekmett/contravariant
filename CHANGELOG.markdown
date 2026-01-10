@@ -5,6 +5,11 @@
   `transformers`. These data types were previously deprecated and have been
   removed in `transformers-0.6.*`.
 
+1.5.6 [2026.01.10]
+------------------
+* Drop support for pre-8.0 versions of GHC.
+* Support building with MicroHs.
+
 1.5.5 [2021.07.27]
 ------------------
 * Fix the build on old GHCs using `transformers-0.6.*`.

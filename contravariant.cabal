@@ -19,9 +19,11 @@ tested-with:   GHC == 8.6.5
              , GHC == 9.0.2
              , GHC == 9.2.8
              , GHC == 9.4.8
-             , GHC == 9.6.5
-             , GHC == 9.8.2
-             , GHC == 9.10.1
+             , GHC == 9.6.7
+             , GHC == 9.8.4
+             , GHC == 9.10.3
+             , GHC == 9.12.2
+             , GHC == 9.14.1
 extra-source-files:
   .hlint.yaml
   CHANGELOG.markdown
@@ -29,7 +31,7 @@ extra-source-files:
 
 source-repository head
   type: git
-  location: git://github.com/ekmett/contravariant.git
+  location: https://github.com/ekmett/contravariant.git
 
 flag StateVar
   description:
@@ -51,7 +53,11 @@ library
   exposed-modules:
     Data.Functor.Contravariant.Compose
     Data.Functor.Contravariant.Divisible
-    Data.Functor.Contravariant.Generic
+
+  if impl(ghc)
+    -- MicroHs doesn't support type families yet
+    exposed-modules:
+      Data.Functor.Contravariant.Generic
 
   if impl(ghc >= 9.0)
     -- these flags may abort compilation with GHC-8.10
